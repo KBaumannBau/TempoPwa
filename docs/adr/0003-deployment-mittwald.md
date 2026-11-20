@@ -16,7 +16,7 @@ Workflow `.github/workflows/deploy.yml` mit drei Jobs:
 1. **api:** PHP 8.4, `composer install`, PHPUnit gegen PostgreSQL 16 (Service-Container), `lint:container` für prod;
    danach `composer install --no-dev`, `assets:install`, Apache-Dateien aus `deploy/mittwald/api/` einfügen, packen.
 2. **app:** Node 22, `npm ci`, `npm run build` (Typecheck + Vite), `.htaccess` aus `deploy/mittwald/app/htaccess.vorlage`,
-   optional Basic Auth (Secrets `TEMPO_BASIC_AUTH_USER`/`_PASSWORD`).
+   Basic Auth wie in TempoVibe (Standard kbaumann/kbaumann, eigene Werte über die Secrets `TEMPO_BASIC_AUTH_USER`/`_PASSWORD`).
 3. **deploy** (nur wenn beide grün): rsync über SSH (`easingthemes/ssh-deploy`, Secrets `TEMPO_SSH_*` wie in TempoVibe)
    - API → `/home/p-yt27xz/html/tempo-api/`, danach auf dem Server `nach-dem-deploy.sh`
      (`.env.local` beim ersten Mal anlegen, Cache aufbauen, Migrationen, falls die Datenbank erreichbar ist)
