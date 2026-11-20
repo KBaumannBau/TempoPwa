@@ -1,6 +1,6 @@
 # Tempo – Stundenerfassung K. Baumann Bau
 # Dienste: nginx (Einstieg, ein Origin), php (PHP-FPM, Symfony + API Platform),
-#          database (PostgreSQL 16), pwa (Vite-Devserver, nur dev).
+#          database (PostgreSQL 17), pwa (Vite-Devserver, nur dev).
 #
 # Keine Geheimnisse in dieser Datei. Alle Werte kommen aus .env (ignoriert),
 # Vorlage: .env.example. Pflichtwerte brechen den Start mit Meldung ab (${VAR:?}).
@@ -12,7 +12,7 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
+  postgres17_data:
 
 services:
   nginx:
@@ -55,7 +55,7 @@ services:
       APP_ENV: ${APP_ENV:-dev}
       APP_DEBUG: ${APP_DEBUG:-1}
       APP_SECRET: ${APP_SECRET:?APP_SECRET fehlt in .env}
-      DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER fehlt in .env}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}@database:5432/${POSTGRES_DB:-tempo}?serverVersion=16&charset=utf8
+      DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER fehlt in .env}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}@database:5432/${POSTGRES_DB:-tempo}?serverVersion=17&charset=utf8
       DEFAULT_URI: http://localhost:${HTTP_PORT:-8001}
     depends_on:
       database:
@@ -65,7 +65,7 @@ services:
       - app_network
 
   database:
-    image: postgres:16
+    image: postgres:17
     container_name: tempo-database
     ports:
       - ${HOST_IP:-0.0.0.0}:${DB_PORT:-5432}:5432
@@ -76,7 +76,7 @@ services:
       TZ: UTC
       PGTZ: UTC
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres17_data:/var/lib/postgresql/data
       - ./docker/postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]

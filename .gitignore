@@ -38,3 +38,6 @@ Thumbs.db
 # Exporte
 ZEITERF*.DAT
 /_tmp/
+
+# Server-Umgebung für Mittwald (enthält Geheimnisse)
+/mittwald.env

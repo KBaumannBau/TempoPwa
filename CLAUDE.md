@@ -37,7 +37,7 @@ Pfad: `~/Developer/privat/baumann/TempoVibe` (eigenes Repo, eigenes Claude-Proje
 
 ```
 Tempo/
-├── compose.yaml            # Dienste: nginx, php (PHP-FPM), database (PostgreSQL 16), pwa (Node/Vite)
+├── compose.yaml            # Dienste: nginx, php (PHP-FPM), database (PostgreSQL 17), pwa (Node/Vite)
 ├── .env.example            # Vorlage für Ports und Geheimnisse (.env selbst ist ignoriert)
 ├── docker/
 │   ├── php/Dockerfile
@@ -76,7 +76,7 @@ Ein Repo, kein Git-Submodule. API und PWA ändern sich gemeinsam in einem Commit
   | API Platform | 5.0 (`api-platform/symfony`, `api-platform/doctrine-orm`, Tests: `api-platform/test`) |
   | Doctrine | ORM 3.8, DoctrineBundle 3.4, Migrations-Bundle 4.0 |
   | PHPUnit | 13 |
-  | PostgreSQL | 16 (`postgres:16`) |
+  | PostgreSQL | 17 (`postgres:17`, wie die Testinstanz bei Supabase) |
   | Node | 22 (`node:22`) |
   | Vite | 8.3 |
   | React / React DOM | 19.3 |
@@ -118,14 +118,14 @@ Ein Repo, kein Git-Submodule. API und PWA ändern sich gemeinsam in einem Commit
   - Security-Header und `deny` für versteckte Dateien und Symfony-Verzeichnisse wie in der Vorlage.
   - Optional Basic Auth für Testinstanzen: `.htpasswd` wird beim Start aus `BASIC_AUTH_USERS` (`user:pass,user:pass`)
     erzeugt, wie in der Vorlage. Die App-Anmeldung läuft über ein Cookie und kommt der Basic Auth nicht in die Quere.
-- **database:** `postgres:16`, Daten in einem benannten Volume, Init-Skripte aus `docker/postgres/`.
+- **database:** `postgres:17`, Daten in einem benannten Volume, Init-Skripte aus `docker/postgres/`.
 - **pwa:** `node:22`, startet `npm run dev -- --host 0.0.0.0` in `pwa/`. In prod nur Build, kein laufender Node-Dienst.
 - **Geheimnisse:** Anders als in `als-crm-api` ist die `compose.yaml` hier versioniert. Darum stehen in ihr **keine**
   Passwörter, Schlüssel oder Tokens. Alles kommt aus `.env` (ignoriert) über `${VAR}` oder `env_file`,
   dazu eine `.env.example` mit Platzhaltern.
 
 **API (`api/`)**
-- Symfony + API Platform, PHP strict types, PostgreSQL 16
+- Symfony + API Platform, PHP strict types, PostgreSQL 17
 - DDD und Clean Architecture: Fachlogik liegt in der Domäne, nicht in Controllern oder Entities.
   - Doctrine-Entities sind **keine** API-Resources. Die API arbeitet mit eigenen DTO-Resources und
     State Providers / Processors.
@@ -259,12 +259,17 @@ Konten in der eigenen Datenbank.
     optional `TEMPO_BASIC_AUTH_USER`/`TEMPO_BASIC_AUTH_PASSWORD` (sonst Basic Auth kbaumann/kbaumann wie in TempoVibe)
     und die Variable `TEMPO_API_URL`.
   - Apache-Dateien und Server-Skript für Mittwald liegen in `deploy/mittwald/`.
-  - Geheimnisse der API nur in `tempo-api/.env.local` auf dem Server (Vorlage `deploy/mittwald/api/env.local.vorlage`).
+  - Geheimnisse der API nur in `tempo-api/.env.local` auf dem Server. Der Deploy legt sie an bzw. ergänzt nur fehlende
+    Werte und Platzhalter: `APP_SECRET` entsteht auf dem Server, `DATABASE_URL` kommt aus dem Secret
+    `TEMPO_API_DATABASE_URL`, CORS und `DEFAULT_URI` aus dem Workflow. Von Hand Geändertes bleibt erhalten.
+    Das Beispiel `deploy/mittwald/api/.env.local.example` wird mit auf den Server synchronisiert.
 
 ## Offene Punkte
 
 - [ ] Betrieb: On-Prem-VM (laut README); Pipeline für die Testinstanz bei Mittwald ist eingerichtet (ADR 0003)
-- [ ] Mittwald: Domains für tempo-app/tempo-api (ein Origin mit Pfad `/api`?), PostgreSQL 16 verfügbar?, PHP 8.4 im Projekt
+- [ ] Mittwald: Domains für tempo-app/tempo-api (ein Origin mit Pfad `/api`?)
+- Datenbank der Testinstanz: Supabase-Projekt `tempo-test` (Region eu-central-1, PostgreSQL 17), Verbindung über den
+  Session-Pooler `aws-0-eu-central-1.pooler.supabase.com:5432` mit TLS (ADR 0003). Nur Testdaten.
 - [ ] Offene Punkte aus dem Schema: Verschlüsselung NU-Stundensätze, RLS für `ausweis_sichtung`,
       wer setzt Löschsperren, restliche RLS-Regeln (Kosten, Disposition), Aufbewahrung 8 oder 10 Jahre
 - [ ] Format ZEITERF.DAT, Nachtrag und Stunden über 9,99 mit der Lohnbuchhaltung bestätigen

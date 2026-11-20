@@ -17,28 +17,58 @@ if [ -z "$PHP" ]; then
 fi
 echo "PHP: $($PHP -r 'echo PHP_VERSION;') ($PHP)"
 
-# .env.local nur beim ersten Deploy anlegen; danach wird sie auf dem Server gepflegt
-if [ ! -f .env.local ]; then
-  umask 077
-  {
-    echo "APP_ENV=prod"
-    echo "APP_DEBUG=0"
-    echo "APP_SECRET=$($PHP -r 'echo bin2hex(random_bytes(32));')"
-    echo "# DATABASE_URL und CORS_ALLOW_ORIGIN eintragen, Vorlage: deploy/mittwald/api/env.local.vorlage"
-    echo "DATABASE_URL=\"postgresql://tempo:change-me@localhost:5432/tempo?serverVersion=16&charset=utf8\""
-  } > .env.local
-  echo "HINWEIS: .env.local neu angelegt – DATABASE_URL ist noch ein Platzhalter."
+# --- .env.local anlegen bzw. ergänzen -----------------------------------------------
+# Die echte .env.local wird nie überschrieben. Ergänzt werden nur Schlüssel, die fehlen oder noch
+# einen Platzhalter (change-me) enthalten. Quelle: .env.local.erstanlage aus der Pipeline.
+umask 077
+[ -f .env.local ] || { : > .env.local; echo ".env.local neu angelegt."; }
+chmod 600 .env.local
+
+# Zeile "KEY=WERT" setzen, wenn KEY fehlt oder noch ein Platzhalter ist
+ergaenzen() {
+  zeile="$1"
+  key="${zeile%%=*}"
+  aktuell="$(grep -E "^${key}=" .env.local | tail -n 1 || true)"
+  if [ -z "$aktuell" ] || printf '%s' "$aktuell" | grep -q 'change-me'; then
+    grep -vE "^${key}=" .env.local > .env.local.tmp || true
+    printf '%s\n' "$zeile" >> .env.local.tmp
+    mv .env.local.tmp .env.local
+    chmod 600 .env.local
+    echo "  .env.local: $key gesetzt"
+  fi
+}
+
+if [ -f .env.local.erstanlage ]; then
+  while IFS= read -r zeile || [ -n "$zeile" ]; do
+    case "$zeile" in ''|'#'*) continue ;; esac
+    ergaenzen "$zeile"
+  done < .env.local.erstanlage
+  rm -f .env.local.erstanlage
 fi
 
-# Cache für prod neu aufbauen
+# Ohne diese Werte liefe Symfony mit APP_ENV=dev aus api/.env – die dev-Pakete sind auf dem Server nicht installiert
+ergaenzen "APP_ENV=prod"
+ergaenzen "APP_DEBUG=0"
+
+# APP_SECRET nur auf dem Server erzeugen, nie aus der Pipeline
+ergaenzen "APP_SECRET=$($PHP -r 'echo bin2hex(random_bytes(32));')"
+
+# Ohne DATABASE_URL startet Symfony nicht: Platzhalter setzen, Health meldet dann "gestoert"
+if ! grep -qE '^DATABASE_URL=' .env.local; then
+  ergaenzen 'DATABASE_URL="postgresql://tempo:change-me@localhost:5432/tempo?serverVersion=17&charset=utf8"'
+  echo "WARNUNG: Keine DATABASE_URL – Repo-Secret TEMPO_API_DATABASE_URL setzen oder .env.local von Hand ergänzen."
+fi
+
+# --- Cache und Migrationen --------------------------------------------------------------
 rm -rf var/cache/prod
 "$PHP" bin/console cache:warmup --env=prod --no-debug
 
 # Migrationen nur, wenn die Datenbank erreichbar ist
 if "$PHP" bin/console dbal:run-sql "SELECT 1" --env=prod --no-debug >/dev/null 2>&1; then
+  echo "Datenbank erreichbar."
   "$PHP" bin/console doctrine:migrations:migrate --env=prod --no-debug --no-interaction --allow-no-migration
 else
-  echo "WARNUNG: Datenbank nicht erreichbar – Migrationen übersprungen. DATABASE_URL in $ZIEL/.env.local prüfen."
+  echo "WARNUNG: Datenbank nicht erreichbar – Migrationen übersprungen. DATABASE_URL in $ZIEL.env.local prüfen."
 fi
 
 echo "API bereit."

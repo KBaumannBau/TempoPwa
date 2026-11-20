@@ -6,6 +6,8 @@
 #
 # Secrets im Repo (Settings → Secrets and variables → Actions), wie in TempoVibe:
 #   TEMPO_SSH_PRIVATE_KEY, TEMPO_SSH_HOST, TEMPO_SSH_USER, TEMPO_SSH_PORT
+# Für die Datenbank der API (wird beim Deploy in tempo-api/.env.local ergänzt, falls dort noch nicht gesetzt):
+#   TEMPO_API_DATABASE_URL
 # Optional:
 #   Secrets  TEMPO_BASIC_AUTH_USER, TEMPO_BASIC_AUTH_PASSWORD  – Basic Auth vor der PWA
 #            (ohne Secrets gilt wie in TempoVibe kbaumann/kbaumann)
@@ -28,6 +30,9 @@ concurrency:
 env:
   TARGET_API: /home/p-yt27xz/html/tempo-api/
   TARGET_APP: /home/p-yt27xz/html/tempo-app/
+  # Adressen der Testinstanz (CORS und DEFAULT_URI der API)
+  API_ORIGIN: https://tempo-api.p-yt27xz.project.space
+  APP_ORIGIN: https://tempo-app.p-yt27xz.project.space
 
 jobs:
   # ---------------------------------------------------------------- API
@@ -36,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       database:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_DB: tempo
           POSTGRES_USER: tempo
@@ -50,7 +55,7 @@ jobs:
       run:
         working-directory: api
     env:
-      DATABASE_URL: postgresql://tempo:ci@127.0.0.1:5432/tempo?serverVersion=16&charset=utf8
+      DATABASE_URL: postgresql://tempo:ci@127.0.0.1:5432/tempo?serverVersion=17&charset=utf8
       APP_SECRET: ci-nur-fuer-tests
     steps:
       - name: Checkout
@@ -100,6 +105,7 @@ jobs:
           cp ../deploy/mittwald/api/.htaccess .htaccess
           cp ../deploy/mittwald/api/public/.htaccess public/.htaccess
           cp ../deploy/mittwald/api/nach-dem-deploy.sh nach-dem-deploy.sh
+          cp ../deploy/mittwald/api/.env.local.example .env.local.example
 
       - name: Paket packen
         run: |
@@ -197,9 +203,31 @@ jobs:
       - name: API entpacken
         run: mkdir api && tar -xzf api-build.tgz -C api
 
+      # Werte für die .env.local auf dem Server. nach-dem-deploy.sh übernimmt daraus nur, was dort
+      # fehlt oder noch ein Platzhalter ist, und löscht die Datei danach. APP_SECRET entsteht auf dem Server.
+      # Die Datei entsteht erst hier im Deploy-Job und steckt nicht im Build-Artefakt.
+      - name: Erstanlage für .env.local
+        env:
+          DATABASE_URL: ${{ secrets.TEMPO_API_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          umask 077
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::warning::Secret TEMPO_API_DATABASE_URL nicht gesetzt – DATABASE_URL wird auf dem Server nicht ergänzt."
+          fi
+          {
+            echo "APP_ENV=prod"
+            echo "APP_DEBUG=0"
+            if [ -n "$DATABASE_URL" ]; then printf 'DATABASE_URL="%s"\n' "$DATABASE_URL"; fi
+            printf "CORS_ALLOW_ORIGIN='%s'\n" "^${APP_ORIGIN//./\\.}\$"
+            echo "DEFAULT_URI=${API_ORIGIN}"
+          } > api/.env.local.erstanlage
+          sed -e 's/^DATABASE_URL=.*/DATABASE_URL="***"/' api/.env.local.erstanlage
+
       # API: --delete entfernt, was nicht mehr im Build ist. Geschützt (EXCLUDE) bleiben
       # .env.local (Geheimnisse, nur auf dem Server), var/ (Cache, Logs) und ACME-Challenges.
-      # Danach auf dem Server: .env.local beim ersten Mal anlegen, Cache aufbauen, Migrationen.
+      # Mit synchronisiert: .env.local.example (Beispiel) und .env.local.erstanlage (wird vom Skript verbraucht).
+      # Danach auf dem Server: .env.local anlegen/ergänzen, Cache aufbauen, Migrationen.
       - name: API deployen (tempo-api)
         uses: easingthemes/ssh-deploy@v6.0.1
         with:
