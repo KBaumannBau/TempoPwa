@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { tx } from '../i18n';
 import { istRuhig } from '../offline/ruhe';
@@ -17,6 +17,7 @@ const PRUEFEN_ALLE_MS = 30 * 60 * 1000;
  */
 export function Aktualisierung() {
   const registrierung = useRef<ServiceWorkerRegistration | undefined>(undefined);
+  const wirdUebernommen = useRef(false);
 
   const {
     needRefresh: [neueVersion],
@@ -48,16 +49,27 @@ export function Aktualisierung() {
     };
   }, []);
 
+  // Neue Version aktivieren und die Seite einmal neu laden, sobald sie die Kontrolle hat.
+  // Das Neuladen machen wir selbst: Workbox meldet ein Update, das über registration.update() gefunden
+  // wurde, als „extern“ und löst dann kein Neuladen aus. Der Listener kommt erst hier dazu, damit die
+  // erste Installation (clientsClaim) die Seite nicht neu lädt.
+  const uebernehmen = useCallback(() => {
+    if (wirdUebernommen.current) return;
+    wirdUebernommen.current = true;
+    navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload(), { once: true });
+    void updateServiceWorker();
+  }, [updateServiceWorker]);
+
   // Neue Version still übernehmen, wenn die App in den Hintergrund geht und nichts in Arbeit ist.
   // Beim Zurückholen ist sie dann schon aktiv, der Mitarbeiter merkt das Neuladen nicht.
   useEffect(() => {
     if (!neueVersion) return;
     const versteckt = () => {
-      if (document.visibilityState === 'hidden' && istRuhig()) void updateServiceWorker(true);
+      if (document.visibilityState === 'hidden' && istRuhig()) uebernehmen();
     };
     document.addEventListener('visibilitychange', versteckt);
     return () => document.removeEventListener('visibilitychange', versteckt);
-  }, [neueVersion, updateServiceWorker]);
+  }, [neueVersion, uebernehmen]);
 
   if (!neueVersion) return null;
 
@@ -68,7 +80,7 @@ export function Aktualisierung() {
         type="button"
         onClick={() => {
           if (istRuhig() || window.confirm(tx('Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?'))) {
-            void updateServiceWorker(true);
+            uebernehmen();
           }
         }}
       >

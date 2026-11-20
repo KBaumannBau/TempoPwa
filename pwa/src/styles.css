@@ -16,6 +16,7 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
 a { color: var(--blau); }
 :focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
 
