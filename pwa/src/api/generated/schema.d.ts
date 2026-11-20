@@ -75,6 +75,8 @@ export interface components {
              * @description Serverzeit (UTC)
              */
             zeit: string;
+            /** @description Version der API, z. B. 0.2.0 oder 0.2.0+abc1234 (Build aus main) */
+            version: string;
         };
         HydraItemBaseSchema: {
             "@context"?: string | ({

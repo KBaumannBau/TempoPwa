@@ -37,6 +37,8 @@ final readonly class Health
         public string $datenbank,
         #[ApiProperty(required: true, description: 'Serverzeit (UTC)')]
         public \DateTimeImmutable $zeit,
+        #[ApiProperty(required: true, description: 'Version der API, z. B. 0.2.0 oder 0.2.0+abc1234 (Build aus main)')]
+        public string $version,
     ) {
     }
 }

@@ -1,29 +1,8 @@
-import { useEffect, useState } from 'react';
-import { api } from '../api/client';
-import type { components } from '../api/generated/schema';
-
-type Health = components['schemas']['Health'];
-
-type Zustand =
-  | { art: 'laedt' }
-  | { art: 'ok'; health: Health }
-  | { art: 'fehler'; text: string };
+import { useHealth } from '../api/health';
 
 /** Vorläufige Startseite: zeigt, ob PWA, API und Datenbank zusammenspielen. */
 export function Start() {
-  const [zustand, setZustand] = useState<Zustand>({ art: 'laedt' });
-
-  useEffect(() => {
-    let aktiv = true;
-    api.GET('/api/health')
-      .then(({ data, error, response }) => {
-        if (!aktiv) return;
-        if (data) setZustand({ art: 'ok', health: data });
-        else setZustand({ art: 'fehler', text: `HTTP ${response.status}${error ? ` – ${JSON.stringify(error)}` : ''}` });
-      })
-      .catch((e: unknown) => aktiv && setZustand({ art: 'fehler', text: e instanceof Error ? e.message : String(e) }));
-    return () => { aktiv = false; };
-  }, []);
+  const zustand = useHealth();
 
   return (
     <main className="start">

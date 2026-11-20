@@ -50,6 +50,9 @@ Tempo/
 ├── api/                    # Symfony + API Platform
 ├── pwa/                    # Vite + React + TypeScript + vite-plugin-pwa
 ├── deploy/mittwald/        # Apache-Dateien und Server-Skript für die Testinstanz
+├── deployment.sh           # Deploy (Push auf main) und Release (Version, Tag) über Git
+├── VERSION                 # aktuelle Version, gelesen von API (Swagger, Health), PWA (Fußzeile), README (Badge)
+├── README.md               # Einstieg: Umgebungen, Start, Befehle, Deployment
 ├── .github/workflows/      # Build, Test und Deploy nach Mittwald
 ├── docs/                   # Architekturentscheidungen (adr/), Übernahme-Stand (uebernahme.md)
 └── CLAUDE.md
@@ -259,6 +262,10 @@ Konten in der eigenen Datenbank.
     optional `TEMPO_BASIC_AUTH_USER`/`TEMPO_BASIC_AUTH_PASSWORD` (sonst Basic Auth kbaumann/kbaumann wie in TempoVibe)
     und die Variable `TEMPO_API_URL`.
   - Apache-Dateien und Server-Skript für Mittwald liegen in `deploy/mittwald/`.
+  - **Versionen:** Quelle ist `VERSION`. Push auf `main` deployt `X.Y.Z+<commit>`, ein Tag `vX.Y.Z` deployt `X.Y.Z`
+    und legt ein GitHub-Release an. `./deployment.sh release [patch|minor|major|X.Y.Z]` erhöht die Version
+    (VERSION, README-Badge, `pwa/package.json`), committet, taggt und pusht – das Skript führt der Mensch aus,
+    nicht Claude (keine Commits/Pushes durch Claude).
   - Geheimnisse der API nur in `tempo-api/.env.local` auf dem Server. Der Deploy legt sie an bzw. ergänzt nur fehlende
     Werte und Platzhalter: `APP_SECRET` entsteht auf dem Server, `DATABASE_URL` kommt aus dem Secret
     `TEMPO_API_DATABASE_URL`, CORS und `DEFAULT_URI` aus dem Workflow. Von Hand Geändertes bleibt erhalten.

@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\System\Api\Resource\Health;
 use Doctrine\DBAL\Connection;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 
@@ -20,6 +21,8 @@ final readonly class HealthProvider implements ProviderInterface
         private Connection $connection,
         private ClockInterface $clock,
         private LoggerInterface $logger,
+        #[Autowire(param: 'app.version')]
+        private string $version,
     ) {
     }
 
@@ -31,6 +34,7 @@ final readonly class HealthProvider implements ProviderInterface
             status: $datenbank === 'ok' ? 'ok' : 'gestoert',
             datenbank: $datenbank,
             zeit: $this->clock->now()->setTimezone(new \DateTimeZone('UTC')),
+            version: $this->version,
         );
     }
 

@@ -41,3 +41,5 @@ ZEITERF*.DAT
 
 # Server-Umgebung für Mittwald (enthält Geheimnisse)
 /mittwald.env
+# Von der Pipeline ins API-Paket geschrieben (Quelle ist VERSION im Wurzelordner)
+/api/VERSION

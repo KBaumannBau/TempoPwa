@@ -8,6 +8,9 @@
 #   TEMPO_SSH_PRIVATE_KEY, TEMPO_SSH_HOST, TEMPO_SSH_USER, TEMPO_SSH_PORT
 # Für die Datenbank der API (wird beim Deploy in tempo-api/.env.local ergänzt, falls dort noch nicht gesetzt):
 #   TEMPO_API_DATABASE_URL
+# Version: Datei VERSION im Wurzelordner (gepflegt von ./deployment.sh).
+#   Push auf main  -> Build-Version "X.Y.Z+<commit>" auf die Testinstanz
+#   Tag vX.Y.Z     -> Release "X.Y.Z": Tag muss zu VERSION passen, Deploy und GitHub-Release
 # Optional:
 #   Secrets  TEMPO_BASIC_AUTH_USER, TEMPO_BASIC_AUTH_PASSWORD  – Basic Auth vor der PWA
 #            (ohne Secrets gilt wie in TempoVibe kbaumann/kbaumann)
@@ -20,6 +23,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   # Manuell (Redeploy): Actions → "Deploy to Mittwald" → Run workflow
   workflow_dispatch:
 
@@ -35,9 +40,52 @@ env:
   APP_ORIGIN: https://tempo-app.p-yt27xz.project.space
 
 jobs:
+  # ---------------------------------------------------------------- Version
+  version:
+    name: Version bestimmen
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      release: ${{ steps.v.outputs.release }}
+      deploy: ${{ steps.v.outputs.deploy }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-tags: true
+
+      - id: v
+        name: Version aus VERSION
+        run: |
+          set -euo pipefail
+          basis="$(tr -d '[:space:]' < VERSION)"
+          if ! printf '%s' "$basis" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::VERSION enthält keine gültige Version: '$basis'"; exit 1
+          fi
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            if [ "$GITHUB_REF_NAME" != "v$basis" ]; then
+              echo "::error::Tag $GITHUB_REF_NAME passt nicht zu VERSION ($basis)."; exit 1
+            fi
+            version="$basis"; release=true; deploy=true
+          else
+            version="$basis+${GITHUB_SHA::7}"; release=false; deploy=true
+            # Trägt der Commit schon ein Release-Tag, deployt der Tag-Lauf (sonst zwei Deploys um die Wette)
+            if git tag --points-at HEAD | grep -qx "v$basis"; then
+              deploy=false
+              echo "::notice::Commit ist als v$basis getaggt – Deploy übernimmt der Lauf für das Tag."
+            fi
+          fi
+          echo "Version: $version (Release: $release, Deploy: $deploy)"
+          {
+            echo "version=$version"
+            echo "release=$release"
+            echo "deploy=$deploy"
+          } >> "$GITHUB_OUTPUT"
+
   # ---------------------------------------------------------------- API
   api:
     name: API bauen und testen
+    needs: version
     runs-on: ubuntu-latest
     services:
       database:
@@ -100,8 +148,11 @@ jobs:
           APP_ENV=prod APP_DEBUG=0 php bin/console assets:install public --env=prod --no-debug
           rm -rf var
 
-      - name: Apache-Dateien und Deploy-Skript einfügen
+      - name: Apache-Dateien, Deploy-Skript und Version einfügen
+        env:
+          APP_VERSION: ${{ needs.version.outputs.version }}
         run: |
+          printf '%s\n' "$APP_VERSION" > VERSION
           cp ../deploy/mittwald/api/.htaccess .htaccess
           cp ../deploy/mittwald/api/public/.htaccess public/.htaccess
           cp ../deploy/mittwald/api/nach-dem-deploy.sh nach-dem-deploy.sh
@@ -123,6 +174,7 @@ jobs:
   # ---------------------------------------------------------------- PWA
   app:
     name: PWA bauen
+    needs: version
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -146,6 +198,7 @@ jobs:
         run: npm run build
         env:
           VITE_API_URL: ${{ vars.TEMPO_API_URL }}
+          APP_VERSION: ${{ needs.version.outputs.version }}
 
       # .htaccess aus der Vorlage mit Basic Auth (APR1-MD5, von Apache unterstützt).
       # ACME-Challenges bleiben offen, sonst scheitert die Zertifikatsverlängerung still.
@@ -192,7 +245,8 @@ jobs:
   # (und umgekehrt). Beide starten nur, wenn API und PWA fehlerfrei gebaut sind.
   deploy-api:
     name: Deploy API nach Mittwald
-    needs: [api, app]
+    needs: [version, api, app]
+    if: needs.version.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
@@ -212,9 +266,8 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          if [ -z "$DATABASE_URL" ]; then
-            echo "::warning::Secret TEMPO_API_DATABASE_URL nicht gesetzt – DATABASE_URL wird auf dem Server nicht ergänzt."
-          fi
+          # Ohne Secret bleibt die DATABASE_URL auf dem Server, wie sie ist. Fehlt sie dort ganz,
+          # meldet das nach-dem-deploy.sh im nächsten Schritt.
           {
             echo "APP_ENV=prod"
             echo "APP_DEBUG=0"
@@ -245,7 +298,8 @@ jobs:
 
   deploy-app:
     name: Deploy PWA nach Mittwald
-    needs: [api, app]
+    needs: [version, api, app]
+    if: needs.version.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
@@ -266,3 +320,21 @@ jobs:
           ARGS: "-rlptgoDzv --delete"
           SSH_CMD_ARGS: "-o StrictHostKeyChecking=no,-o IdentitiesOnly=yes"
           EXCLUDE: "/.well-known/"
+
+  # ---------------------------------------------------------------- Release
+  # Nur für Tags vX.Y.Z: GitHub-Release mit automatisch erzeugten Notizen, nachdem beides deployt ist.
+  # Ein Prod-System gibt es noch nicht (Betrieb offen, CLAUDE.md); ein Prod-Deploy kommt hier dazu.
+  release:
+    name: GitHub-Release anlegen
+    needs: [version, deploy-api, deploy-app]
+    if: needs.version.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Release anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+            --title "Tempo $GITHUB_REF_NAME" --generate-notes --verify-tag

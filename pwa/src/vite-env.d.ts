@@ -8,3 +8,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** Version der App (aus VERSION bzw. der Pipeline), eingesetzt von Vite beim Bauen */
+declare const __APP_VERSION__: string;
