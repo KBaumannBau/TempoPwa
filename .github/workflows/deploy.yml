@@ -179,8 +179,10 @@ jobs:
           retention-days: 3
 
   # ---------------------------------------------------------------- Deploy
-  deploy:
-    name: Deploy nach Mittwald
+  # Zwei getrennte Deploy-Jobs: Scheitert das Server-Skript der API, kommt die PWA trotzdem an
+  # (und umgekehrt). Beide starten nur, wenn API und PWA fehlerfrei gebaut sind.
+  deploy-api:
+    name: Deploy API nach Mittwald
     needs: [api, app]
     runs-on: ubuntu-latest
     steps:
@@ -188,11 +190,6 @@ jobs:
         with:
           name: api-build
           path: .
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: app-build
-          path: app/
 
       - name: API entpacken
         run: mkdir api && tar -xzf api-build.tgz -C api
@@ -214,6 +211,16 @@ jobs:
           EXCLUDE: "/.env.local, /var/, /.well-known/"
           SCRIPT_AFTER: sh ${{ env.TARGET_API }}nach-dem-deploy.sh ${{ env.TARGET_API }}
           SCRIPT_AFTER_REQUIRED: "true"
+
+  deploy-app:
+    name: Deploy PWA nach Mittwald
+    needs: [api, app]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: app-build
+          path: app/
 
       # PWA: nur der Inhalt von dist/. --delete entfernt alte Hash-Assets.
       - name: PWA deployen (tempo-app)
