@@ -823,5 +823,6 @@
  "Das Passwort stimmt nicht.": "The password is wrong.",
  "Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief mit Einmal-Passwort.": "Forgot your password? Payroll will send you a new letter with a one-time password.",
  "Melde dich dort mit Benutzername und Passwort an. Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief.": "Sign in there with your user name and password. Forgot your password? Payroll will send you a new letter.",
- "Neu anmelden": "Sign in again"
+ "Neu anmelden": "Sign in again",
+ "offline": "offline"
 }

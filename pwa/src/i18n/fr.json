@@ -823,5 +823,6 @@
  "Das Passwort stimmt nicht.": "Le mot de passe est incorrect.",
  "Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief mit Einmal-Passwort.": "Mot de passe oublié ? Le service de paie t’envoie une nouvelle lettre avec un mot de passe à usage unique.",
  "Melde dich dort mit Benutzername und Passwort an. Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief.": "Connecte-toi avec ton identifiant et ton mot de passe. Mot de passe oublié ? Le service de paie t’envoie une nouvelle lettre.",
- "Neu anmelden": "Se reconnecter"
+ "Neu anmelden": "Se reconnecter",
+ "offline": "hors ligne"
 }

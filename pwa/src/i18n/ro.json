@@ -823,5 +823,6 @@
  "Das Passwort stimmt nicht.": "Parola nu este corectă.",
  "Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief mit Einmal-Passwort.": "Ai uitat parola? Biroul de salarizare îți trimite o scrisoare nouă cu parolă unică.",
  "Melde dich dort mit Benutzername und Passwort an. Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief.": "Conectează-te acolo cu numele de utilizator și parola. Ai uitat parola? Biroul de salarizare îți trimite o scrisoare nouă.",
- "Neu anmelden": "Conectează-te din nou"
+ "Neu anmelden": "Conectează-te din nou",
+ "offline": "offline"
 }

@@ -1,23 +1,55 @@
-/* Vorläufige Grundstile; das Aussehen aus TempoVibe (src/styles.css) kommt mit den ersten Bildschirmen. */
+/* Grundstile. Farben und Maße aus TempoVibe (src/styles.css, Entwurf V2); der Rest kommt mit den Bildschirmen. */
 :root {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color: #1b1f24;
-  background: #f4f6f8;
+  --blau: #0077c8;
+  --blau-dunkel: #005a8c;
+  --blau-hell: #e6f1f9;
+  --text: #14212b;
+  --text-2: #44505a;
+  --rand: #dde3e8;
+  --grund: #f3f5f7;
+  --weiss: #ffffff;
+  --kopf: 56px;
+  font-family: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--grund);
+  -webkit-text-size-adjust: 100%;
 }
+* { box-sizing: border-box; }
 body { margin: 0; }
-.start { max-width: 32rem; margin: 0 auto; padding: 2rem 1rem; }
-.start h1 { margin: 0; color: #1f3a5f; }
-.karte { background: #fff; border-radius: 12px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
-.karte h2 { font-size: 1rem; margin-top: 0; }
-.karte dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0; }
-.karte dt { color: #5b6470; }
-.karte dd { margin: 0; font-weight: 600; }
-.fehler { color: #b00020; }
+a { color: var(--blau); }
+:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
+
+/* Blaue Kopfleiste wie in TempoVibe. In der installierten App auf dem iPhone liegt die Statusleiste
+   über der Kopfleiste (black-translucent), deshalb der Abstand safe-area-inset-top. */
+.kopf {
+  position: sticky; top: 0; z-index: 5; flex-shrink: 0;
+  height: calc(var(--kopf) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 12px 0 16px;
+  background: var(--blau); color: var(--weiss);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.kopf-logo { color: var(--weiss); display: block; }
+.kopf-rechts { display: flex; align-items: center; gap: 4px; }
+.kopf-offline {
+  font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18); color: var(--weiss);
+}
 
 .rahmen { min-height: 100dvh; display: flex; flex-direction: column; }
 .rahmen-inhalt { flex: 1; }
+
+.start { max-width: 32rem; margin: 0 auto; padding: 1.5rem 1rem; }
+.start h1 { margin: 0; color: var(--blau-dunkel); }
+.hinweis { background: var(--blau-hell); color: var(--blau-dunkel); border-radius: 10px; padding: 10px 12px; }
+.karte { background: var(--weiss); border-radius: 12px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+.karte h2 { font-size: 1rem; margin-top: 0; }
+.karte dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0; }
+.karte dt { color: var(--text-2); }
+.karte dd { margin: 0; font-weight: 600; }
+.fehler { color: #b3261e; }
+
 .fusszeile {
   display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem 1rem;
   padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
-  font-size: 0.8rem; color: #5b6470; border-top: 1px solid #e1e5ea;
+  font-size: 0.8rem; color: var(--text-2); border-top: 1px solid var(--rand);
 }

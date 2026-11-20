@@ -823,5 +823,6 @@
  "Das Passwort stimmt nicht.": "Lozinka nije točna.",
  "Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief mit Einmal-Passwort.": "Zaboravljena lozinka? Obračun plaća šalje ti novo pismo s jednokratnom lozinkom.",
  "Melde dich dort mit Benutzername und Passwort an. Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief.": "Tamo se prijavi korisničkim imenom i lozinkom. Zaboravljena lozinka? Obračun plaća šalje ti novo pismo.",
- "Neu anmelden": "Ponovno se prijavi"
+ "Neu anmelden": "Ponovno se prijavi",
+ "offline": "offline"
 }

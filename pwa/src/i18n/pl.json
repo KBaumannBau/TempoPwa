@@ -823,5 +823,6 @@
  "Das Passwort stimmt nicht.": "Hasło jest błędne.",
  "Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief mit Einmal-Passwort.": "Nie pamiętasz hasła? Dział płac wyśle ci nowy list z hasłem jednorazowym.",
  "Melde dich dort mit Benutzername und Passwort an. Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief.": "Zaloguj się tam nazwą użytkownika i hasłem. Nie pamiętasz hasła? Dział płac wyśle ci nowy list.",
- "Neu anmelden": "Zaloguj się ponownie"
+ "Neu anmelden": "Zaloguj się ponownie",
+ "offline": "offline"
 }

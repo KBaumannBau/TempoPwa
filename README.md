@@ -39,7 +39,7 @@ Tempo/
 ├── pwa/                 Vite + React 19 + TypeScript, Bildschirme unter src/screens/{ma,polier,bau,pc,nu}
 ├── docker/              php (PHP-FPM), nginx, postgres – lokale Umgebung
 ├── deploy/mittwald/     Apache-Dateien und Server-Skript für die Testinstanz
-├── docs/                Architekturentscheidungen (adr/) und Übernahme-Stand (uebernahme.md)
+├── docs/                Architekturentscheidungen (adr/), Offline-Konzept (pwa/), Übernahme-Stand (uebernahme.md)
 ├── .github/workflows/   Build, Test und Deploy nach Mittwald
 ├── compose.yaml         lokale Dienste: nginx, php, database, pwa
 ├── deployment.sh        Deploy und Release über Git
@@ -82,6 +82,59 @@ Der `pwa`-Container installiert die npm-Pakete beim Start selbst und startet den
 
 Die Typen in `pwa/src/api/generated/` entstehen aus dem OpenAPI-Schema der API. Nicht von Hand ändern, nach
 jeder Änderung an der API neu erzeugen.
+
+## App auf dem Handy installieren (auch ohne Netz)
+
+Tempo ist eine PWA. Mitarbeiter installieren sie wie eine App auf dem Home-Bildschirm. Danach startet sie
+auch ohne Netz, zum Beispiel auf der Baustelle. Es gibt keinen App Store, installiert wird über den Browser.
+
+**Voraussetzung:** Die App muss über **HTTPS** aufgerufen werden, z. B. die Testinstanz
+https://tempo-app.p-yt27xz.project.space/. Beim ersten Öffnen braucht das Handy Netz. Danach ein paar
+Sekunden warten, bis die App komplett auf dem Handy liegt.
+
+### iPhone (Safari)
+
+1. Die Adresse in **Safari** öffnen und, wenn verlangt, anmelden.
+2. Unten auf **Teilen** tippen (Quadrat mit Pfeil nach oben).
+3. **Zum Home-Bildschirm** wählen. Falls nicht sichtbar, in der Liste nach unten scrollen.
+4. Name „Tempo“ lassen und **Hinzufügen** tippen. Auf dem Home-Bildschirm erscheint das blaue „K.“.
+5. Ab jetzt die App **immer über das Icon** starten, nicht über Safari.
+
+Ab iOS 16.4 geht das auch aus Chrome oder Edge über das Teilen-Menü. Für die gespeicherten Daten zählt
+die App auf dem Home-Bildschirm. Safari löscht Daten von Websites, die sieben Tage nicht genutzt wurden.
+Für die installierte App gilt das nicht. Darum ist die Installation für Mitarbeiter Pflicht.
+
+### Android (Chrome)
+
+1. Die Adresse in **Chrome** öffnen und, wenn verlangt, anmelden.
+2. Chrome zeigt unten **„App installieren“** an. Darauf tippen.
+   Falls nicht: oben rechts **⋮** → **App installieren** (bei älteren Versionen **Zum Startbildschirm hinzufügen**).
+3. **Installieren** bestätigen. Das blaue „K.“ erscheint auf dem Startbildschirm und in der App-Liste.
+
+Samsung Internet: **Menü** → **Seite hinzufügen zu** → **Startbildschirm**.
+
+### Prüfen, ob es offline geht
+
+1. App einmal mit Netz über das Icon öffnen und kurz warten.
+2. **Flugmodus** einschalten.
+3. App schließen (aus der App-Übersicht wischen) und über das Icon neu starten.
+4. Die App öffnet sich, in der blauen Kopfleiste steht **„offline“**.
+
+### Gut zu wissen
+
+- **Updates** kommen von selbst: Ist Netz da, lädt die App die neue Version im Hintergrund. Beim nächsten
+  Start ist sie aktiv. Die Version steht in der Fußzeile.
+- **Was offline geht:** In dieser ersten Version startet die App ohne Netz und zeigt den Offline-Hinweis.
+  Stempeln ohne Netz mit späterem Abgleich ist der nächste Schritt. Wie das funktioniert und wie Konflikte
+  vermieden werden, steht in [docs/pwa/offline.md](docs/pwa/offline.md).
+- **Website-Daten nicht löschen.** Darin liegen später Stempelungen, die noch nicht gesendet sind.
+- **Testinstanz mit Basic Auth:** Die App fragt beim ersten Start eventuell noch einmal nach dem Zugang.
+  Das gibt es nur auf der Testinstanz, nicht im Echtbetrieb.
+- **Lokal am Handy testen:** Ein Service Worker läuft nur über HTTPS (oder `localhost`). Die lokale
+  Umgebung unter `http://<IP-des-Rechners>:8001` lässt sich am Handy öffnen, aber **nicht offline
+  installieren**. Offline-Tests am Handy daher auf der Testinstanz machen oder über einen HTTPS-Tunnel.
+- **App-Icons** erzeugt `node scripts/icons.mjs` im Ordner `pwa/` (braucht ImageMagick für die PNG-Dateien).
+  Quelle ist die Bildmarke „K.“ aus dem Logo, Farbe Baumann-Blau `#0077c8`.
 
 ## Deployment und Versionen
 
@@ -139,6 +192,7 @@ und wird bei jedem Deploy mit kopiert. Details: [ADR 0003](docs/adr/0003-deploym
 
 - **[CLAUDE.md](CLAUDE.md)** ist verbindlich: Architektur (DDD, DTO-Resources statt Entities, RLS), fachliche
   Regeln, Sprachen, Datengrundsätze.
+- **[docs/pwa/offline.md](docs/pwa/offline.md)** beschreibt Offline-Betrieb, Abgleich und Konfliktvermeidung der PWA.
 - **[docs/uebernahme.md](docs/uebernahme.md)** ist die Checkliste aller Bildschirme und Ketten aus TempoVibe, mit
   den Tabellen je Kette. Reihenfolge: Anmeldung/Zugang → Stunden → Anträge → Disposition → NU → Kosten/Leitung.
 - **TempoVibe** ist die fachliche Wahrheit und wird nicht verändert.

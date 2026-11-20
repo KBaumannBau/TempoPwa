@@ -19,9 +19,12 @@ Die App hat drei Bereiche und eine Zusatz-App:
 
 Pfad: `~/Developer/privat/baumann/TempoVibe` (eigenes Repo, eigenes Claude-Projekt)
 
+- **Zugriff:** Claude hat in diesem Projekt **immer vollen Zugriff** auf das Nebenprojekt TempoVibe
+  (lesen und schreiben). Dafür muss nicht extra nachgefragt werden; fehlt der Ordner in der Sitzung,
+  wird er direkt mit angefordert.
 - TempoVibe ist die **fachliche Wahrheit** für Abläufe, Bildschirme, Texte und Regeln. Bei Unklarheit
   zuerst dort nachsehen, dann fragen.
-- In TempoVibe wird **nichts geändert**. Es wird nur gelesen und übernommen.
+- Standard ist: aus TempoVibe wird gelesen und übernommen. Geändert wird dort nur, wenn es ausdrücklich verlangt ist.
 - Wichtige Dateien dort:
   - `CLAUDE.md`: fachliche Regeln (unten übernommen)
   - `docs/demo-app.md`: alle Rollen, Bildschirme und die Ketten zum Ausprobieren
@@ -54,7 +57,7 @@ Tempo/
 ├── VERSION                 # aktuelle Version, gelesen von API (Swagger, Health), PWA (Fußzeile), README (Badge)
 ├── README.md               # Einstieg: Umgebungen, Start, Befehle, Deployment
 ├── .github/workflows/      # Build, Test und Deploy nach Mittwald
-├── docs/                   # Architekturentscheidungen (adr/), Übernahme-Stand (uebernahme.md)
+├── docs/                   # Architekturentscheidungen (adr/), Offline-Konzept (pwa/), Übernahme-Stand (uebernahme.md)
 └── CLAUDE.md
 ```
 
@@ -147,6 +150,9 @@ Ein Repo, kein Git-Submodule. API und PWA ändern sich gemeinsam in einem Commit
 - API-Typen werden aus dem OpenAPI-Schema der API **generiert** (`src/api/generated/`, nicht von Hand ändern).
 - Offline: Stempeln muss ohne Netz funktionieren. Stempelungen landen in einer lokalen Warteschlange
   (IndexedDB) und werden nachgesendet (Herkunft `nachgesendet`). Der Server ist führend.
+  Verbindliches Konzept: `docs/pwa/offline.md` (Ereignisse mit Client-UUID statt Zustandsabgleich,
+  idempotente Operationen, ein Besitzer je Tag, fachliche Klärfälle statt technischer Konflikte).
+- App-Icons: `pwa/scripts/icons.mjs` (weißes „K.“ auf `#0077c8`), Installation auf dem Handy im README.
 - Die Struktur der Bildschirme aus TempoVibe bleibt erhalten: `src/screens/{ma,polier,bau,pc,nu}`.
 - Der Zustand aus `store.tsx` (localStorage) wird durch API-Aufrufe ersetzt. Kein localStorage für Fachdaten.
 - `npm run build` (Typecheck und Build) muss fehlerfrei durchlaufen.

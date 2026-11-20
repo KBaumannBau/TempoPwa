@@ -27,24 +27,36 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['favicon.svg'],
+      // Die Testinstanz liegt hinter Basic Auth: Manifest mit Zugangsdaten laden
+      useCredentials: true,
+      includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
+        id: '/',
         name: 'Tempo – Stundenerfassung K. Baumann Bau',
         short_name: 'Tempo',
-        description: 'Stundenerfassung für Mitarbeiter, Polier, Bauleitung und Büro',
+        description: 'Stundenerfassung für Mitarbeiter, Polier, Bauleitung und Büro. Stempeln geht auch ohne Netz.',
         lang: 'de',
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#1f3a5f',
-        icons: [{ src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }],
+        background_color: '#0077c8',
+        theme_color: '#0077c8',
+        // Icons erzeugt mit scripts/icons.mjs (weißes „K.“ aus dem Logo auf Baumann-Blau)
+        icons: [
+          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/icons/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+        ],
       },
       workbox: {
         // Die API wird nie vom Service Worker als App-Shell beantwortet
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api(\/|$)/, /^\/bundles\//, /^\/_profiler/, /^\/_wdt/],
+        // App-Hülle komplett auf dem Handy (Precache), damit die App ohne Netz startet.
+        // Fachdaten liegen nicht hier, sondern später in IndexedDB (docs/pwa/offline.md).
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,json}'],
+        cleanupOutdatedCaches: true,
       },
       // Im Devserver kein Service Worker, sonst stört er HMR
       devOptions: { enabled: false },
