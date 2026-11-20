@@ -141,10 +141,26 @@ Ein Mensch kann jeden dieser Fälle im normalen Ablauf lösen, ohne dass Daten v
   selbst räumt. Auf dem iPhone räumt Safari Website-Daten nach sieben Tagen ohne Nutzung. Für eine **zum
   Home-Bildschirm hinzugefügte** App gilt das nicht. Darum ist die Installation für Mitarbeiter Pflicht.
 - Die Daten sind klein (Stempelungen weniger Tage). Mengen sind kein Problem, nur die Haltbarkeit.
-- **App-Update:** Der Service Worker lädt neue Versionen im Hintergrund. Aktiviert wird die neue Version
-  erst, wenn der Ausgang leer ist oder die App neu startet. Jeder Eintrag im Ausgang trägt eine
-  `version`. Der Server nimmt die Vorgängerversion jedes Ereignisses mindestens zwei Releases lang an.
-  So kann ein Handy, das eine Woche offline war, seinen Ausgang noch abliefern.
+- **App-Update** (umgesetzt in `pwa/src/components/Aktualisierung.tsx`):
+  - *Ausliefern:* Jeder Deploy erzeugt eine neue `sw.js` mit der Liste aller Dateien und ihren Prüfsummen.
+    `sw.js`, `index.html` und Manifest werden nie gecacht (`deploy/mittwald/app/htaccess.vorlage`). Geladen
+    werden nur geänderte Dateien.
+  - *Nachfragen:* beim Start, bei jedem Wechsel in den Vordergrund (`visibilitychange`), wenn wieder Netz da
+    ist, und alle 30 Minuten, solange die App offen ist. Das ist wichtig fürs iPhone: Dort wird eine
+    installierte App oft tagelang nur aus dem Hintergrund geholt und nie neu gestartet.
+  - *Übernehmen:* `registerType: 'prompt'`. Die neue Version wartet im Hintergrund und wird **nicht mitten in
+    der Arbeit** aktiviert, sondern
+    1. still, sobald die App in den Hintergrund geht **und ruhig ist**, also kein Bildschirm etwas in Arbeit hat
+       (`useBeschaeftigt`) und der Ausgang leer ist (`ausgangPruefenMit`, kommt mit dem Sync-Modul).
+       Beim Zurückholen ist sie schon aktiv. Der Mitarbeiter merkt nichts.
+    2. oder, wenn der Mitarbeiter auf den Hinweis „Neue Version der App verfügbar“ tippt (mit Rückfrage, falls
+       noch etwas in Arbeit ist),
+    3. spätestens beim nächsten Kaltstart der App.
+  - *Alte Stände:* Jeder Eintrag im Ausgang trägt eine `version`. Der Server nimmt die Vorgängerversion jedes
+    Ereignisses mindestens zwei Releases lang an. So kann ein Handy, das eine Woche offline war, seinen
+    Ausgang noch abliefern, bevor es die neue Version übernimmt.
+  - *Notfall (noch offen):* `GET /api/health` bzw. `/api/ich/stand` meldet eine Mindestversion der App. Liegt
+    das Handy darunter, sendet es nichts mehr und zeigt „Bitte aktualisieren“, bis die neue Version da ist.
 - Lesestand und Ausgang haben ein eigenes Schema mit Versionsnummer (IndexedDB `onupgradeneeded`). Ein
   Update darf den Ausgang nie löschen, nur umschreiben.
 
@@ -189,7 +205,7 @@ fremde** Daten entscheidet, braucht Netz.
 ## 11. Umsetzung in Schritten
 
 1. **Erledigt mit der ersten PWA-Version:** installierbare App mit Icon, App-Hülle offline (Precache),
-   Anzeige online/offline.
+   Anzeige online/offline, kontrollierte Updates (Abschnitt 7).
 2. Modul `pwa/src/sync/`: IndexedDB (`idb`), Ausgang, Abgleich mit Web Lock, Statusanzeige. Tests mit
    `fake-indexeddb`.
 3. API: `POST /api/stempelungen` idempotent mit Client-ID, `GET /api/ich/stand`.

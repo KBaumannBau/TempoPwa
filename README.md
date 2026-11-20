@@ -122,8 +122,11 @@ Samsung Internet: **Menü** → **Seite hinzufügen zu** → **Startbildschirm**
 
 ### Gut zu wissen
 
-- **Updates** kommen von selbst: Ist Netz da, lädt die App die neue Version im Hintergrund. Beim nächsten
-  Start ist sie aktiv. Die Version steht in der Fußzeile.
+- **Updates** kommen von selbst, ohne App Store. Nach einem Deploy fragt die App beim Start, beim Zurückholen
+  aus dem Hintergrund und alle 30 Minuten nach einer neuen Version und lädt sie im Hintergrund. Aktiv wird
+  sie nicht mitten in der Arbeit, sondern wenn die App in den Hintergrund geht und nichts in Arbeit ist,
+  wenn man auf **„Jetzt aktualisieren“** tippt oder spätestens beim nächsten Neustart der App. Die Version
+  steht in der Fußzeile. Details: [docs/pwa/offline.md](docs/pwa/offline.md), Abschnitt 7.
 - **Was offline geht:** In dieser ersten Version startet die App ohne Netz und zeigt den Offline-Hinweis.
   Stempeln ohne Netz mit späterem Abgleich ist der nächste Schritt. Wie das funktioniert und wie Konflikte
   vermieden werden, steht in [docs/pwa/offline.md](docs/pwa/offline.md).

@@ -35,6 +35,15 @@ a { color: var(--blau); }
   background: rgba(255, 255, 255, 0.18); color: var(--weiss);
 }
 
+.aktualisierung {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 10px 16px; background: var(--blau-hell); color: var(--blau-dunkel); font-weight: 600;
+}
+.aktualisierung button {
+  min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; cursor: pointer;
+  background: var(--blau); color: var(--weiss); font-weight: 700;
+}
+
 .rahmen { min-height: 100dvh; display: flex; flex-direction: column; }
 .rahmen-inhalt { flex: 1; }
 

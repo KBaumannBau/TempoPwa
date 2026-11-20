@@ -824,5 +824,8 @@
  "Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief mit Einmal-Passwort.": "Mot de passe oublié ? Le service de paie t’envoie une nouvelle lettre avec un mot de passe à usage unique.",
  "Melde dich dort mit Benutzername und Passwort an. Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief.": "Connecte-toi avec ton identifiant et ton mot de passe. Mot de passe oublié ? Le service de paie t’envoie une nouvelle lettre.",
  "Neu anmelden": "Se reconnecter",
- "offline": "hors ligne"
+ "offline": "hors ligne",
+ "Neue Version der App verfügbar.": "Une nouvelle version de l’application est disponible.",
+ "Jetzt aktualisieren": "Mettre à jour",
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Une saisie est encore en cours. Mettre à jour quand même ?"
 }

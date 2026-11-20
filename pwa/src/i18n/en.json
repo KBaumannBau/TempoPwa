@@ -824,5 +824,8 @@
  "Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief mit Einmal-Passwort.": "Forgot your password? Payroll will send you a new letter with a one-time password.",
  "Melde dich dort mit Benutzername und Passwort an. Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief.": "Sign in there with your user name and password. Forgot your password? Payroll will send you a new letter.",
  "Neu anmelden": "Sign in again",
- "offline": "offline"
+ "offline": "offline",
+ "Neue Version der App verfügbar.": "A new version of the app is available.",
+ "Jetzt aktualisieren": "Update now",
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Something is still in progress. Update anyway?"
 }

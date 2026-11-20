@@ -25,8 +25,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      // Updates kontrolliert übernehmen, nicht mitten in der Arbeit (components/Aktualisierung.tsx,
+      // docs/pwa/offline.md Abschnitt 7). Registriert wird der Service Worker in Aktualisierung.tsx.
+      registerType: 'prompt',
+      injectRegister: false,
       // Die Testinstanz liegt hinter Basic Auth: Manifest mit Zugangsdaten laden
       useCredentials: true,
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
@@ -57,6 +59,10 @@ export default defineConfig({
         // Fachdaten liegen nicht hier, sondern später in IndexedDB (docs/pwa/offline.md).
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,json}'],
         cleanupOutdatedCaches: true,
+        // Schon beim ersten Besuch die offene Seite übernehmen: Die App läuft dann sofort offline, und
+        // spätere Updates melden sich zuverlässig („controlling“), damit die Seite einmal neu lädt.
+        // Kein skipWaiting: Eine neue Version wartet, bis Aktualisierung.tsx sie freigibt.
+        clientsClaim: true,
       },
       // Im Devserver kein Service Worker, sonst stört er HMR
       devOptions: { enabled: false },

@@ -824,5 +824,8 @@
  "Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief mit Einmal-Passwort.": "Password dimenticata? L’ufficio paghe ti manda una nuova lettera con password monouso.",
  "Melde dich dort mit Benutzername und Passwort an. Passwort vergessen? Die Lohnbuchhaltung schickt dir einen neuen Brief.": "Accedi lì con nome utente e password. Password dimenticata? L’ufficio paghe ti manda una nuova lettera.",
  "Neu anmelden": "Accedi di nuovo",
- "offline": "offline"
+ "offline": "offline",
+ "Neue Version der App verfügbar.": "È disponibile una nuova versione dell’app.",
+ "Jetzt aktualisieren": "Aggiorna ora",
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Qualcosa è ancora in corso. Aggiornare comunque?"
 }
