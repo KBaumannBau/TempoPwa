@@ -1,0 +1,107 @@
+# Tempo – Stundenerfassung K. Baumann Bau
+# Dienste: nginx (Einstieg, ein Origin), php (PHP-FPM, Symfony + API Platform),
+#          database (PostgreSQL 16), pwa (Vite-Devserver, nur dev).
+#
+# Keine Geheimnisse in dieser Datei. Alle Werte kommen aus .env (ignoriert),
+# Vorlage: .env.example. Pflichtwerte brechen den Start mit Meldung ab (${VAR:?}).
+
+name: tempo
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: tempo-nginx
+    ports:
+      - ${HOST_IP:-0.0.0.0}:${HTTP_PORT:-8001}:8001
+    volumes:
+      - ./docker/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/conf/pwa-dev.conf:/etc/nginx/pwa/pwa-dev.conf:ro
+      - ./docker/nginx/conf/pwa-prod.conf:/etc/nginx/pwa/pwa-prod.conf:ro
+      - ./docker/nginx/start.sh:/usr/local/bin/tempo-start.sh:ro
+      - .:/var/www/html:cached
+      - ./log:/var/log/nginx
+    environment:
+      # dev = Proxy auf den Vite-Devserver (HMR), prod = statischer Build aus pwa/dist
+      PWA_MODUS: ${PWA_MODUS:-dev}
+      # Optional für Testinstanzen: "user:pass,user:pass" – leer = keine Basic Auth
+      BASIC_AUTH_USERS: ${BASIC_AUTH_USERS:-}
+    command: ["/bin/sh", "/usr/local/bin/tempo-start.sh"]
+    depends_on:
+      - php
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: tempo-php
+    volumes:
+      - .:/var/www/html:cached
+      - ./docker/php/myPhp.ini:/usr/local/etc/php/conf.d/zzz_myPhp.ini:ro
+      - ./docker/php/home/:/home/www
+    working_dir: /var/www/html/api
+    environment:
+      PHP_IDE_CONFIG: 'serverName=docker'
+      APP_ENV: ${APP_ENV:-dev}
+      APP_DEBUG: ${APP_DEBUG:-1}
+      APP_SECRET: ${APP_SECRET:?APP_SECRET fehlt in .env}
+      DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER fehlt in .env}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}@database:5432/${POSTGRES_DB:-tempo}?serverVersion=16&charset=utf8
+      DEFAULT_URI: http://localhost:${HTTP_PORT:-8001}
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  database:
+    image: postgres:16
+    container_name: tempo-database
+    ports:
+      - ${HOST_IP:-0.0.0.0}:${DB_PORT:-5432}:5432
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tempo}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER fehlt in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  pwa:
+    image: node:22
+    container_name: tempo-pwa
+    user: node
+    working_dir: /var/www/html/pwa
+    volumes:
+      - .:/var/www/html:cached
+    environment:
+      # Port, unter dem der Browser nginx erreicht (für den HMR-Websocket)
+      HTTP_PORT: ${HTTP_PORT:-8001}
+      # Auf Dateisystemen ohne Datei-Ereignisse: VITE_POLLING=1
+      VITE_POLLING: ${VITE_POLLING:-0}
+      # Quelle für "npm run api:types" (innerhalb des Docker-Netzes)
+      API_SCHEMA_URL: http://nginx:8001/api/docs.jsonopenapi
+    command: ["sh", "-c", "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"]
+    restart: unless-stopped
+    networks:
+      - app_network

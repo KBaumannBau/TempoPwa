@@ -1,0 +1,230 @@
+# ============================================================
+# Tempo: Build, Test und Deploy nach Mittwald (rsync über SSH)
+#   API (Symfony)  -> /home/p-yt27xz/html/tempo-api
+#   PWA (Vite)     -> /home/p-yt27xz/html/tempo-app
+# Deployt wird nur, wenn API und PWA beide fehlerfrei gebaut und getestet sind.
+#
+# Secrets im Repo (Settings → Secrets and variables → Actions), wie in TempoVibe:
+#   TEMPO_SSH_PRIVATE_KEY, TEMPO_SSH_HOST, TEMPO_SSH_USER, TEMPO_SSH_PORT
+# Optional:
+#   Secrets  TEMPO_BASIC_AUTH_USER, TEMPO_BASIC_AUTH_PASSWORD  – Basic Auth vor der PWA
+#   Variable TEMPO_API_URL – Adresse der API, wenn sie nicht unter derselben Domain wie die PWA
+#            unter /api läuft (z. B. https://api.example.de). Leer = gleicher Origin.
+# ============================================================
+name: Deploy to Mittwald
+
+on:
+  push:
+    branches:
+      - main
+  # Manuell (Redeploy): Actions → "Deploy to Mittwald" → Run workflow
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-tempo
+  cancel-in-progress: false
+
+env:
+  TARGET_API: /home/p-yt27xz/html/tempo-api/
+  TARGET_APP: /home/p-yt27xz/html/tempo-app/
+
+jobs:
+  # ---------------------------------------------------------------- API
+  api:
+    name: API bauen und testen
+    runs-on: ubuntu-latest
+    services:
+      database:
+        image: postgres:16
+        env:
+          POSTGRES_DB: tempo
+          POSTGRES_USER: tempo
+          POSTGRES_PASSWORD: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tempo -d tempo"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    defaults:
+      run:
+        working-directory: api
+    env:
+      DATABASE_URL: postgresql://tempo:ci@127.0.0.1:5432/tempo?serverVersion=16&charset=utf8
+      APP_SECRET: ci-nur-fuer-tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: PHP 8.4 einrichten
+        uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, intl, bcmath, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Composer-Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('api/composer.lock') }}
+
+      # Tests mit allen Abhängigkeiten
+      - name: composer install (mit dev)
+        run: composer install --no-interaction --no-progress --prefer-dist
+        env:
+          APP_ENV: test
+
+      - name: Testdatenbank anlegen
+        run: php bin/console doctrine:database:create --env=test --if-not-exists
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit
+
+      - name: Container prüfen (prod)
+        run: php bin/console lint:container --env=prod --no-debug
+        env:
+          APP_ENV: prod
+
+      # Auslieferung: ohne dev-Pakete, ohne Tests
+      - name: composer install (prod)
+        run: |
+          rm -rf vendor var
+          composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader --no-scripts
+          APP_ENV=prod APP_DEBUG=0 php bin/console assets:install public --env=prod --no-debug
+          rm -rf var
+
+      - name: Apache-Dateien und Deploy-Skript einfügen
+        run: |
+          cp ../deploy/mittwald/api/.htaccess .htaccess
+          cp ../deploy/mittwald/api/public/.htaccess public/.htaccess
+          cp ../deploy/mittwald/api/nach-dem-deploy.sh nach-dem-deploy.sh
+
+      - name: Paket packen
+        run: |
+          tar -czf ../api-build.tgz \
+            --exclude=./tests --exclude=./.phpunit.cache --exclude=./phpunit.dist.xml \
+            --exclude=./.env.test --exclude=./.env.local --exclude=./AGENTS.md --exclude=./.editorconfig \
+            .
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: api-build
+          path: api-build.tgz
+          retention-days: 3
+
+  # ---------------------------------------------------------------- PWA
+  app:
+    name: PWA bauen
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pwa
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Node einrichten
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: pwa/package-lock.json
+
+      - name: npm ci
+        run: npm ci
+
+      # Typecheck (tsc -b) + Vite-Build → dist/. Ein TypeScript-Fehler bricht hier ab.
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.TEMPO_API_URL }}
+
+      # .htaccess aus der Vorlage; optional Basic Auth (APR1-MD5, von Apache unterstützt).
+      # ACME-Challenges bleiben offen, sonst scheitert die Zertifikatsverlängerung still.
+      - name: .htaccess und Basic Auth
+        env:
+          BASIC_AUTH_USER: ${{ secrets.TEMPO_BASIC_AUTH_USER }}
+          BASIC_AUTH_PASSWORD: ${{ secrets.TEMPO_BASIC_AUTH_PASSWORD }}
+        run: |
+          set -euo pipefail
+          cp ../deploy/mittwald/app/htaccess.vorlage dist/.htaccess
+          if [ -n "$BASIC_AUTH_USER" ] && [ -n "$BASIC_AUTH_PASSWORD" ]; then
+            printf '%s:%s\n' "$BASIC_AUTH_USER" "$(openssl passwd -apr1 "$BASIC_AUTH_PASSWORD")" > dist/.htpasswd
+            cat > auth.txt <<AUTH
+          AuthType Basic
+          AuthName "Tempo"
+          AuthUserFile ${TARGET_APP}.htpasswd
+          <RequireAny>
+              Require expr "%{REQUEST_URI} =~ m#^/\.well-known/acme-challenge/#"
+              Require valid-user
+          </RequireAny>
+          <Files ".htpasswd">
+              Require all denied
+          </Files>
+          AUTH
+          else
+            echo "::warning::Keine Basic Auth: TEMPO_BASIC_AUTH_USER/TEMPO_BASIC_AUTH_PASSWORD nicht gesetzt – die PWA ist öffentlich erreichbar."
+            echo "# keine Basic Auth" > auth.txt
+          fi
+          sed -i -e '/# @@BASIC_AUTH@@/{r auth.txt' -e 'd}' dist/.htaccess
+          rm auth.txt
+          cat dist/.htaccess
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: app-build
+          path: pwa/dist/
+          include-hidden-files: true
+          retention-days: 3
+
+  # ---------------------------------------------------------------- Deploy
+  deploy:
+    name: Deploy nach Mittwald
+    needs: [api, app]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: api-build
+          path: .
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: app-build
+          path: app/
+
+      - name: API entpacken
+        run: mkdir api && tar -xzf api-build.tgz -C api
+
+      # API: --delete entfernt, was nicht mehr im Build ist. Geschützt (EXCLUDE) bleiben
+      # .env.local (Geheimnisse, nur auf dem Server), var/ (Cache, Logs) und ACME-Challenges.
+      # Danach auf dem Server: .env.local beim ersten Mal anlegen, Cache aufbauen, Migrationen.
+      - name: API deployen (tempo-api)
+        uses: easingthemes/ssh-deploy@v6.0.1
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.TEMPO_SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.TEMPO_SSH_HOST }}
+          REMOTE_USER: ${{ secrets.TEMPO_SSH_USER }}
+          REMOTE_PORT: ${{ secrets.TEMPO_SSH_PORT }}
+          SOURCE: api/
+          TARGET: ${{ env.TARGET_API }}
+          ARGS: "-rlptgoDzv --delete"
+          SSH_CMD_ARGS: "-o StrictHostKeyChecking=no,-o IdentitiesOnly=yes"
+          EXCLUDE: "/.env.local, /var/, /.well-known/"
+          SCRIPT_AFTER: sh ${{ env.TARGET_API }}nach-dem-deploy.sh ${{ env.TARGET_API }}
+          SCRIPT_AFTER_REQUIRED: "true"
+
+      # PWA: nur der Inhalt von dist/. --delete entfernt alte Hash-Assets.
+      - name: PWA deployen (tempo-app)
+        uses: easingthemes/ssh-deploy@v6.0.1
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.TEMPO_SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.TEMPO_SSH_HOST }}
+          REMOTE_USER: ${{ secrets.TEMPO_SSH_USER }}
+          REMOTE_PORT: ${{ secrets.TEMPO_SSH_PORT }}
+          SOURCE: app/
+          TARGET: ${{ env.TARGET_APP }}
+          ARGS: "-rlptgoDzv --delete"
+          SSH_CMD_ARGS: "-o StrictHostKeyChecking=no,-o IdentitiesOnly=yes"
+          EXCLUDE: "/.well-known/"

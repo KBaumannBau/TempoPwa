@@ -1,0 +1,39 @@
+# Umgebungsvariablen / Geheimnisse (nur die Datei im Wurzelordner;
+# api/.env, api/.env.dev und api/.env.test von Symfony bleiben versioniert)
+/.env
+!/.env.example
+/api/.env.local
+/api/.env.local.php
+/api/.env.*.local
+
+# Docker
+/log/*
+!/log/.gitkeep
+/docker/php/home/*
+!/docker/php/home/.gitkeep
+
+# API
+/api/vendor/
+/api/var/
+/api/public/bundles/
+/api/.phpunit.cache/
+/api/phpunit.xml
+
+# PWA
+/pwa/node_modules/
+/pwa/dist/
+/pwa/dev-dist/
+*.tsbuildinfo
+
+# IDE (Projekteinstellungen regelt .idea/.gitignore)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+
+# Exporte
+ZEITERF*.DAT

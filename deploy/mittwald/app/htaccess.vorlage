@@ -1,0 +1,31 @@
+# Tempo-PWA auf Mittwald (Apache) – Wurzel von /html/tempo-app
+# Wird beim Deploy aus dieser Vorlage erzeugt (.github/workflows/deploy.yml).
+Options -Indexes
+DirectoryIndex index.html
+AddType application/manifest+json .webmanifest
+
+# @@BASIC_AUTH@@
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Vorhandene Dateien und Ordner direkt ausliefern
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    # Client-Routing (BrowserRouter): alle übrigen Pfade bekommen index.html
+    RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # Service Worker, Manifest und Einstieg nie cachen, damit Updates sofort ankommen
+    <FilesMatch "^(index\.html|sw\.js|registerSW\.js|manifest\.webmanifest)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+    # Gebaute Dateien mit Hash im Namen dürfen lange gecacht werden
+    <If "%{REQUEST_URI} =~ m#^/assets/#">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </If>
+</IfModule>

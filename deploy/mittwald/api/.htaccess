@@ -1,0 +1,8 @@
+# Tempo-API auf Mittwald (Apache) – Wurzel von /html/tempo-api
+# Zeigt die Domain auf tempo-api statt auf tempo-api/public, geht trotzdem alles nach public/.
+# Damit sind .env.local, vendor/, var/ und config/ von außen nie erreichbar.
+# (Zeigt die Domain direkt auf public/, wird diese Datei nicht benutzt.)
+Options -Indexes
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/
+RewriteRule ^(.*)$ public/$1 [L]
