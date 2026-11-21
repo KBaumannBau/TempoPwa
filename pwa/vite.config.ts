@@ -16,7 +16,7 @@ function appVersion(): string {
 
 // Läuft im pwa-Container hinter nginx (ein Origin, siehe docker/nginx/conf).
 // Der Browser spricht nur mit nginx; der HMR-Websocket geht deshalb über HTTP_PORT.
-const httpPort = Number(process.env.HTTP_PORT ?? 8001);
+const httpPort = Number(process.env.HTTP_PORT ?? 8011);
 
 export default defineConfig({
   define: {

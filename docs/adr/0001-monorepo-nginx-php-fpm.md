@@ -35,6 +35,7 @@ Die PWA soll sich per Cookie anmelden (HttpOnly, SameSite) und offline stempeln 
 - Kein CORS, Cookies und Service-Worker-Scope bleiben einfach.
 - Lokal und auf dem Server gleicher Aufbau; für prod fehlt noch der Build-Schritt der PWA im Deployment
   (Betrieb noch offen, siehe `CLAUDE.md`).
-- Port 8001 ist lokal auch der Standard von `als-crm-api`; wer beides parallel betreibt, setzt `HTTP_PORT` in `.env`.
+- Lokal ist 8011 der Standard (`HTTP_PORT`), weil `als-crm-api` schon 8001 belegt; so laufen beide parallel.
+  Im Container lauscht nginx weiter auf 8001 (`listen 8001`, `API_SCHEMA_URL`).
 - Die Content-Security-Policy erlaubt `ws:`/`wss:` und `'unsafe-inline'` (Vite-HMR, Swagger UI). Für prod
   später verschärfen.

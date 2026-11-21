@@ -25,7 +25,7 @@ und Abläufe werden hier Kette für Kette nachgebaut.
 | **App (PWA)** | https://tempo-app.p-yt27xz.project.space/ | Testinstanz der PWA (ohne Basic Auth) |
 | **API** | https://tempo-api.p-yt27xz.project.space/api/docs | REST-API mit Swagger-Oberfläche, Smoke-Test: [`/api/health`](https://tempo-api.p-yt27xz.project.space/api/health) |
 | **TempoVibe** | https://tempo-vibe.p-yt27xz.project.space/ | klickbarer Prototyp, fachliche Referenz (eigenes Repo) |
-| **Lokal** | http://localhost:8001 | PWA mit HMR, API unter `/api`, Profiler unter `/_profiler` |
+| **Lokal** | http://localhost:8011 | PWA mit HMR, API unter `/api`, Profiler unter `/_profiler` |
 
 Die laufende Version steht in der **Fußzeile der App**, als **Badge im Kopf von `/api/docs`** und im Feld
 `version` von `/api/health`. Testdeploys aus `main` tragen die Commit-Kennung (`0.1.0+abc1234`), Releases nur
@@ -62,9 +62,9 @@ docker compose exec php composer install
 
 Danach:
 
-- PWA: http://localhost:8001 (Port über `HTTP_PORT` in `.env` änderbar)
-- API-Doku: http://localhost:8001/api/docs
-- Health: http://localhost:8001/api/health
+- PWA: http://localhost:8011 (Port über `HTTP_PORT` in `.env` änderbar)
+- API-Doku: http://localhost:8011/api/docs
+- Health: http://localhost:8011/api/health
 
 Der `pwa`-Container installiert die npm-Pakete beim Start selbst und startet den Vite-Devserver.
 
@@ -79,6 +79,10 @@ Der `pwa`-Container installiert die npm-Pakete beim Start selbst und startet den
 | API-Typen für die PWA erzeugen | `docker compose exec pwa npm run api:types` |
 | Prod-Build lokal ansehen | `PWA_MODUS=prod docker compose up -d nginx` (vorher `npm run build`) |
 | Logs | `docker compose logs -f nginx php pwa` |
+
+Im PHP-Container gibt es Kurzbefehle: `docker compose exec php bash` öffnet eine Shell im Ordner `api/`, `help` zeigt
+alle Befehle (z. B. `c` für die Konsole, `cdmm` für Migrationen, `testdb` und `test` für PHPUnit). Definiert in
+[`docker/php/home/.bashrc`](docker/php/home/.bashrc).
 
 Die Typen in `pwa/src/api/generated/` entstehen aus dem OpenAPI-Schema der API. Nicht von Hand ändern, nach
 jeder Änderung an der API neu erzeugen.
@@ -132,7 +136,7 @@ Samsung Internet: **Menü** → **Seite hinzufügen zu** → **Startbildschirm**
   vermieden werden, steht in [docs/pwa/offline.md](docs/pwa/offline.md).
 - **Website-Daten nicht löschen.** Darin liegen später Stempelungen, die noch nicht gesendet sind.
 - **Lokal am Handy testen:** Ein Service Worker läuft nur über HTTPS (oder `localhost`). Die lokale
-  Umgebung unter `http://<IP-des-Rechners>:8001` lässt sich am Handy öffnen, aber **nicht offline
+  Umgebung unter `http://<IP-des-Rechners>:8011` lässt sich am Handy öffnen, aber **nicht offline
   installieren**. Offline-Tests am Handy daher auf der Testinstanz machen oder über einen HTTPS-Tunnel.
 - **App-Icons** erzeugt `node scripts/icons.mjs` im Ordner `pwa/` (braucht ImageMagick für die PNG-Dateien).
   Quelle ist die Bildmarke „K.“ aus dem Logo, Farbe Baumann-Blau `#0077c8`.

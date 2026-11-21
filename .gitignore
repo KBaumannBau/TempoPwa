@@ -11,6 +11,7 @@
 !/log/.gitkeep
 /docker/php/home/*
 !/docker/php/home/.gitkeep
+!/docker/php/home/.bashrc
 
 # API
 /api/vendor/

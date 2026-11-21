@@ -108,7 +108,7 @@ Ein Repo, kein Git-Submodule. API und PWA ändern sich gemeinsam in einem Commit
 - Kein FrankenPHP, kein Caddy, keine Docker-Dateien aus der API-Platform-Distribution.
 - Dienste mit festen Namen `nginx`, `php`, `database`, `pwa`; `container_name` mit Präfix `tempo-`
   (z. B. `tempo-nginx`); ein Netzwerk `app_network` (bridge).
-- Ports immer über Variablen mit Default: `${HOST_IP:-0.0.0.0}:${HTTP_PORT:-8001}:8001`, ebenso für die Datenbank.
+- Ports immer über Variablen mit Default: `${HOST_IP:-0.0.0.0}:${HTTP_PORT:-8011}:8001`, ebenso für die Datenbank.
 - Das ganze Repo wird nach `/var/www/html` gemountet (`:cached`), in `nginx` und `php`.
 - **php:** eigenes Image `docker/php/Dockerfile` auf Basis `php:8.4-fpm`.
   - Erweiterungen nur nach Bedarf: `pdo_pgsql`, `intl`, `opcache`, `bcmath`, `zip`; dazu Xdebug, Composer, Symfony CLI.
