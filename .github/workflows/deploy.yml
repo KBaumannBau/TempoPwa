@@ -12,8 +12,6 @@
 #   Push auf main  -> Build-Version "X.Y.Z+<commit>" auf die Testinstanz
 #   Tag vX.Y.Z     -> Release "X.Y.Z": Tag muss zu VERSION passen, Deploy und GitHub-Release
 # Optional:
-#   Secrets  TEMPO_BASIC_AUTH_USER, TEMPO_BASIC_AUTH_PASSWORD  – Basic Auth vor der PWA
-#            (ohne Secrets gilt wie in TempoVibe kbaumann/kbaumann)
 #   Variable TEMPO_API_URL – Adresse der API, wenn sie nicht unter derselben Domain wie die PWA
 #            unter /api läuft (z. B. https://api.example.de). Leer = gleicher Origin.
 # ============================================================
@@ -200,37 +198,12 @@ jobs:
           VITE_API_URL: ${{ vars.TEMPO_API_URL }}
           APP_VERSION: ${{ needs.version.outputs.version }}
 
-      # .htaccess aus der Vorlage mit Basic Auth (APR1-MD5, von Apache unterstützt).
-      # ACME-Challenges bleiben offen, sonst scheitert die Zertifikatsverlängerung still.
-      - name: .htaccess und Basic Auth
-        env:
-          # Wie in TempoVibe: Testinstanz nicht öffentlich, Standard kbaumann/kbaumann.
-          # Eigene Zugangsdaten über die Secrets TEMPO_BASIC_AUTH_USER/TEMPO_BASIC_AUTH_PASSWORD.
-          BASIC_AUTH_USER: ${{ secrets.TEMPO_BASIC_AUTH_USER || 'kbaumann' }}
-          BASIC_AUTH_PASSWORD: ${{ secrets.TEMPO_BASIC_AUTH_PASSWORD || 'kbaumann' }}
+      # .htaccess aus der Vorlage (ohne Basic Auth: die Testinstanz ist offen, die App hat eine eigene Anmeldung).
+      # Eine alte .htpasswd auf dem Server entfernt der Deploy über rsync --delete.
+      - name: .htaccess
         run: |
           set -euo pipefail
           cp ../deploy/mittwald/app/htaccess.vorlage dist/.htaccess
-          if [ -n "$BASIC_AUTH_USER" ] && [ -n "$BASIC_AUTH_PASSWORD" ]; then
-            printf '%s:%s\n' "$BASIC_AUTH_USER" "$(openssl passwd -apr1 "$BASIC_AUTH_PASSWORD")" > dist/.htpasswd
-            cat > auth.txt <<AUTH
-          AuthType Basic
-          AuthName "Tempo"
-          AuthUserFile ${TARGET_APP}.htpasswd
-          <RequireAny>
-              Require expr "%{REQUEST_URI} =~ m#^/\.well-known/acme-challenge/#"
-              Require valid-user
-          </RequireAny>
-          <Files ".htpasswd">
-              Require all denied
-          </Files>
-          AUTH
-          else
-            echo "::error::Basic Auth ohne Benutzer oder Passwort – Deploy abgebrochen."
-            exit 1
-          fi
-          sed -i -e '/# @@BASIC_AUTH@@/{r auth.txt' -e 'd}' dist/.htaccess
-          rm auth.txt
           cat dist/.htaccess
 
       - uses: actions/upload-artifact@v7

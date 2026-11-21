@@ -29,8 +29,6 @@ export default defineConfig({
       // docs/pwa/offline.md Abschnitt 7). Registriert wird der Service Worker in Aktualisierung.tsx.
       registerType: 'prompt',
       injectRegister: false,
-      // Die Testinstanz liegt hinter Basic Auth: Manifest mit Zugangsdaten laden
-      useCredentials: true,
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
         id: '/',

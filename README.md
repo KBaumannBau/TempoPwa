@@ -22,7 +22,7 @@ und Abläufe werden hier Kette für Kette nachgebaut.
 
 | | Adresse | Inhalt |
 |---|---|---|
-| **App (PWA)** | https://tempo-app.p-yt27xz.project.space/ | Testinstanz der PWA, Basic Auth wie bei TempoVibe |
+| **App (PWA)** | https://tempo-app.p-yt27xz.project.space/ | Testinstanz der PWA (ohne Basic Auth) |
 | **API** | https://tempo-api.p-yt27xz.project.space/api/docs | REST-API mit Swagger-Oberfläche, Smoke-Test: [`/api/health`](https://tempo-api.p-yt27xz.project.space/api/health) |
 | **TempoVibe** | https://tempo-vibe.p-yt27xz.project.space/ | klickbarer Prototyp, fachliche Referenz (eigenes Repo) |
 | **Lokal** | http://localhost:8001 | PWA mit HMR, API unter `/api`, Profiler unter `/_profiler` |
@@ -131,8 +131,6 @@ Samsung Internet: **Menü** → **Seite hinzufügen zu** → **Startbildschirm**
   Stempeln ohne Netz mit späterem Abgleich ist der nächste Schritt. Wie das funktioniert und wie Konflikte
   vermieden werden, steht in [docs/pwa/offline.md](docs/pwa/offline.md).
 - **Website-Daten nicht löschen.** Darin liegen später Stempelungen, die noch nicht gesendet sind.
-- **Testinstanz mit Basic Auth:** Die App fragt beim ersten Start eventuell noch einmal nach dem Zugang.
-  Das gibt es nur auf der Testinstanz, nicht im Echtbetrieb.
 - **Lokal am Handy testen:** Ein Service Worker läuft nur über HTTPS (oder `localhost`). Die lokale
   Umgebung unter `http://<IP-des-Rechners>:8001` lässt sich am Handy öffnen, aber **nicht offline
   installieren**. Offline-Tests am Handy daher auf der Testinstanz machen oder über einen HTTPS-Tunnel.
@@ -175,7 +173,6 @@ Settings → Secrets and variables → Actions:
 |---|---|---|
 | `TEMPO_SSH_PRIVATE_KEY`, `TEMPO_SSH_HOST`, `TEMPO_SSH_USER`, `TEMPO_SSH_PORT` | Secret | Zugang zu Mittwald (wie TempoVibe) |
 | `TEMPO_API_DATABASE_URL` | Secret, optional | `DATABASE_URL` für `tempo-api/.env.local`, nur wenn sie dort fehlt oder ein Platzhalter ist |
-| `TEMPO_BASIC_AUTH_USER`, `TEMPO_BASIC_AUTH_PASSWORD` | Secret, optional | eigene Basic Auth vor der PWA (sonst wie TempoVibe) |
 | `TEMPO_API_URL` | Variable | Adresse der API für die PWA (`https://tempo-api.p-yt27xz.project.space`) |
 
 Geheimnisse der API liegen nur in `tempo-api/.env.local` auf dem Server. Was dort von Hand steht, bleibt

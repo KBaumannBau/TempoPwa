@@ -265,8 +265,8 @@ Konten in der eigenen Datenbank.
   testen sowie PWA bauen, nur wenn beides grün ist per rsync nach Mittwald:
   API → `/home/p-yt27xz/html/tempo-api`, PWA → `/home/p-yt27xz/html/tempo-app`. Ein Push ist also sofort live.
   - Secrets wie in TempoVibe: `TEMPO_SSH_PRIVATE_KEY`, `TEMPO_SSH_HOST`, `TEMPO_SSH_USER`, `TEMPO_SSH_PORT`;
-    optional `TEMPO_BASIC_AUTH_USER`/`TEMPO_BASIC_AUTH_PASSWORD` (sonst Basic Auth kbaumann/kbaumann wie in TempoVibe)
-    und die Variable `TEMPO_API_URL`.
+    dazu die Variable `TEMPO_API_URL`. Die PWA auf Mittwald hat **keine Basic Auth** mehr (sonst laden Handys
+    Manifest und Icons nicht, und das Logo fehlt); geschützt ist sie durch die eigene Anmeldung der App.
   - Apache-Dateien und Server-Skript für Mittwald liegen in `deploy/mittwald/`.
   - **Versionen:** Quelle ist `VERSION`. Push auf `main` deployt `X.Y.Z+<commit>`, ein Tag `vX.Y.Z` deployt `X.Y.Z`
     und legt ein GitHub-Release an. `./deployment.sh release [patch|minor|major|X.Y.Z]` erhöht die Version

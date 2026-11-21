@@ -4,8 +4,6 @@ Options -Indexes
 DirectoryIndex index.html
 AddType application/manifest+json .webmanifest
 
-# @@BASIC_AUTH@@
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
     # Vorhandene Dateien und Ordner direkt ausliefern
