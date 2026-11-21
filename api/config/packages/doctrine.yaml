@@ -13,9 +13,16 @@ doctrine:
         identity_generation_preferences:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
-        # Entities liegen je Kontext unter src/<Kontext>/Infrastructure/Doctrine/Entity
-        # und werden mit der ersten Kette (Anmeldung/Zugang) hier eingetragen.
-        mappings: {}
+        # Domain classes are mapped with XML per context (src/<Context>/Infrastructure/Doctrine/Mapping),
+        # so the domain stays free of persistence attributes. Tables live in the schema "tempo"; the schema
+        # is written by hand in migrations (no schema diff).
+        mappings:
+            Access:
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Access/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\Access\Domain'
+                alias: Access
 
 when@test:
     doctrine:

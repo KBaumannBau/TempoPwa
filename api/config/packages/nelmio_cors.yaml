@@ -7,7 +7,8 @@ nelmio_cors:
         allow_credentials: true
         allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
         allow_headers: ['Content-Type', 'Authorization']
-        expose_headers: ['Link']
+        # Date: clock offset of the phone (docs/pwa/offline.md), Retry-After: sign-in lock (docs/pwa/authentication.md)
+        expose_headers: ['Link', 'Date', 'Retry-After']
         max_age: 3600
     paths:
         '^/': null

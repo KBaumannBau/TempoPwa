@@ -34,9 +34,9 @@ Kette: Brief mit Einmal-Passwort → erste Anmeldung → eigenes Passwort → Ge
 
 | | Pfad | Bildschirm | Quelle |
 |---|---|---|---|
-| [ ] | `/` | Anmeldung Handy (Person, Passwort/PIN) | `screens/Anmeldung.tsx` · `Anmeldung` |
-| [ ] | `/registrierung` | Registrierung (Einladung, Code, PIN, Datenschutz, Ausweis, Standort) | `screens/Zugang.tsx` · `Registrierung` |
-| [ ] | `/sperre` | tägliches Öffnen mit PIN | `screens/Zugang.tsx` · `Sperre` |
+| [~] | `/` | Anmeldung Handy (Benutzername, Passwort; offline über Tresor, `docs/pwa/authentication.md`) – PWA und API fertig, im Browser durchgeklickt (Brief, eigenes Passwort, Polnisch, Sperren, offline anmelden, Gerät vom Büro abgemeldet); auf dem Handy offen | `screens/Anmeldung.tsx` · `Anmeldung` |
+| [~] | `/registration` | Registrierung (Einmal-Passwort und eigenes Passwort fertig, PWA und API; Datenschutz, Ausweis, Standort offen) | `screens/Zugang.tsx` · `Registrierung` |
+| [~] | `/sperre` | ersetzt durch „App sperren“ + Anmeldung auf `/` (geht offline) | `screens/Zugang.tsx` · `Sperre` |
 | [ ] | `/abgemeldet` | Gerät abgemeldet / Zugang gesperrt | `screens/ma/Rest.tsx` · `Abgemeldet` |
 | [ ] | `/intro` | Einführung | `screens/ma/Extra.tsx` · `Intro` |
 | [ ] | `/datenschutz` | Datenschutz (Rechtstext, versioniert) | `screens/ma/Extra.tsx` · `Datenschutz` |

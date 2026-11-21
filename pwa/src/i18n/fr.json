@@ -827,5 +827,22 @@
  "offline": "hors ligne",
  "Neue Version der App verfügbar.": "Une nouvelle version de l’application est disponible.",
  "Jetzt aktualisieren": "Mettre à jour",
- "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Une saisie est encore en cours. Mettre à jour quand même ?"
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Une saisie est encore en cours. Mettre à jour quand même ?",
+ "Abmelden geht nur mit Internet. Danach braucht dieses Handy wieder eine Anmeldung mit Internet.": "La déconnexion ne fonctionne qu’avec Internet. Ensuite, ce téléphone devra se reconnecter avec Internet.",
+ "Abmelden geht nur mit Internet. Sperren geht auch ohne.": "La déconnexion ne fonctionne qu’avec Internet. Le verrouillage fonctionne aussi sans.",
+ "Angemeldet als {0}": "Connecté en tant que {0}",
+ "App sperren": "Verrouiller l’application",
+ "Beim nächsten Öffnen fragt die App wieder nach dem Passwort. Das geht auch ohne Internet.": "À la prochaine ouverture, l’application redemande le mot de passe. Cela fonctionne aussi sans Internet.",
+ "Die Anmeldung hat nicht geklappt. Bitte später noch einmal versuchen.": "La connexion n’a pas fonctionné. Réessaie plus tard.",
+ "Dieses Handy abmelden": "Déconnecter ce téléphone",
+ "Dieses Handy war seit {0} nicht mehr mit dem Server verbunden. Bitte einmal mit Internet anmelden.": "Ce téléphone n’est plus connecté au serveur depuis le {0}. Connecte-toi une fois avec Internet.",
+ "Einen Moment …": "Un instant …",
+ "Für die erste Anmeldung braucht das Handy Internet.": "Pour la première connexion, le téléphone a besoin d’Internet.",
+ "Hallo {0}!": "Bonjour {0} !",
+ "Kein Internet. Anmelden geht trotzdem, wenn du dich auf diesem Handy schon einmal angemeldet hast.": "Pas d’Internet. Tu peux quand même te connecter si tu t’es déjà connecté sur ce téléphone.",
+ "Kein Internet. Bitte versuche es gleich noch einmal.": "Pas d’Internet. Réessaie dans un instant.",
+ "Kein Internet. Die erste Anmeldung auf diesem Handy geht nur mit Internet.": "Pas d’Internet. La première connexion sur ce téléphone ne fonctionne qu’avec Internet.",
+ "Ohne Internet angemeldet. Was du einträgst, geht raus, sobald wieder Netz da ist.": "Connecté sans Internet. Ce que tu saisis sera envoyé dès que le réseau revient.",
+ "Zu viele falsche Eingaben. Anmelden geht wieder ab {0} Uhr.": "Trop d’erreurs. La connexion sera de nouveau possible à partir de {0}.",
+ "Die Anmeldung mit dem Brief ist abgelaufen. Bitte melde dich noch einmal mit dem Einmal-Passwort an.": "La connexion avec la lettre a expiré. Connecte-toi à nouveau avec le mot de passe à usage unique."
 }

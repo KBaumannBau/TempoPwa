@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Access\Domain\Device" table="device" schema="tempo">
+        <id name="id" type="guid">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="personId" column="person_id" type="guid"/>
+        <field name="label" type="text"/>
+        <field name="keyHash" column="key_hash" type="text"/>
+        <field name="status" type="string" enum-type="App\Access\Domain\DeviceStatus"/>
+        <field name="registeredAt" column="registered_at" type="datetimetz_immutable"/>
+        <field name="lastSeenAt" column="last_seen_at" type="datetimetz_immutable" nullable="true"/>
+        <field name="signedOutAt" column="signed_out_at" type="datetimetz_immutable" nullable="true"/>
+        <field name="signedOutBy" column="signed_out_by" type="guid" nullable="true"/>
+    </entity>
+</doctrine-mapping>

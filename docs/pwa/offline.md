@@ -127,8 +127,9 @@ Ein Mensch kann jeden dieser Fälle im normalen Ablauf lösen, ohne dass Daten v
 
 - Das Handy bleibt über das langlebige, widerrufbare Geräte-Token angemeldet (ADR 0002). Die Sitzung
   läuft über ein HttpOnly-Cookie. Die App kann das Token also nicht lesen und muss das auch nicht.
-- **Offline gibt es keine Prüfung durch den Server.** Die App öffnet mit dem zuletzt bekannten Konto aus
-  dem Lesestand. Das ist vertretbar, weil offline nichts den Server erreicht. Beim nächsten Abgleich prüft
+- **Offline gibt es keine Prüfung durch den Server.** Die App öffnet mit dem zuletzt bekannten Konto.
+  Ist die App gesperrt, prüft sie das Passwort offline über einen Tresor auf dem Handy (`authentication.md`).
+  Das ist vertretbar, weil offline nichts den Server erreicht. Beim nächsten Abgleich prüft
   der Server jeden Eintrag mit dem Geräte-Token.
 - Wird das Gerät gesperrt (Verlust, Austritt), weist der Server den Ausgang ab, und die App löscht beim
   nächsten Kontakt Lesestand und Ausgang.

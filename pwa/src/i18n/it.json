@@ -827,5 +827,22 @@
  "offline": "offline",
  "Neue Version der App verfügbar.": "È disponibile una nuova versione dell’app.",
  "Jetzt aktualisieren": "Aggiorna ora",
- "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Qualcosa è ancora in corso. Aggiornare comunque?"
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Qualcosa è ancora in corso. Aggiornare comunque?",
+ "Abmelden geht nur mit Internet. Danach braucht dieses Handy wieder eine Anmeldung mit Internet.": "La disconnessione funziona solo con internet. Dopo, questo telefono dovrà accedere di nuovo con internet.",
+ "Abmelden geht nur mit Internet. Sperren geht auch ohne.": "La disconnessione funziona solo con internet. Il blocco funziona anche senza.",
+ "Angemeldet als {0}": "Accesso come {0}",
+ "App sperren": "Blocca l’app",
+ "Beim nächsten Öffnen fragt die App wieder nach dem Passwort. Das geht auch ohne Internet.": "Alla prossima apertura l’app chiede di nuovo la password. Funziona anche senza internet.",
+ "Die Anmeldung hat nicht geklappt. Bitte später noch einmal versuchen.": "L’accesso non è riuscito. Riprova più tardi.",
+ "Dieses Handy abmelden": "Disconnetti questo telefono",
+ "Dieses Handy war seit {0} nicht mehr mit dem Server verbunden. Bitte einmal mit Internet anmelden.": "Questo telefono non è collegato al server dal {0}. Accedi una volta con internet.",
+ "Einen Moment …": "Un momento …",
+ "Für die erste Anmeldung braucht das Handy Internet.": "Per il primo accesso il telefono ha bisogno di internet.",
+ "Hallo {0}!": "Ciao {0}!",
+ "Kein Internet. Anmelden geht trotzdem, wenn du dich auf diesem Handy schon einmal angemeldet hast.": "Niente internet. Puoi accedere lo stesso se hai già fatto l’accesso su questo telefono.",
+ "Kein Internet. Bitte versuche es gleich noch einmal.": "Niente internet. Riprova tra poco.",
+ "Kein Internet. Die erste Anmeldung auf diesem Handy geht nur mit Internet.": "Niente internet. Il primo accesso su questo telefono funziona solo con internet.",
+ "Ohne Internet angemeldet. Was du einträgst, geht raus, sobald wieder Netz da ist.": "Accesso senza internet. Quello che inserisci viene inviato appena torna la rete.",
+ "Zu viele falsche Eingaben. Anmelden geht wieder ab {0} Uhr.": "Troppi inserimenti errati. Potrai accedere di nuovo dalle {0}.",
+ "Die Anmeldung mit dem Brief ist abgelaufen. Bitte melde dich noch einmal mit dem Einmal-Passwort an.": "L’accesso con la lettera è scaduto. Accedi di nuovo con la password monouso."
 }

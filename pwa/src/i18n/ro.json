@@ -827,5 +827,22 @@
  "offline": "offline",
  "Neue Version der App verfügbar.": "Este disponibilă o versiune nouă a aplicației.",
  "Jetzt aktualisieren": "Actualizează acum",
- "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Ceva este încă în lucru. Actualizezi totuși?"
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Ceva este încă în lucru. Actualizezi totuși?",
+ "Abmelden geht nur mit Internet. Danach braucht dieses Handy wieder eine Anmeldung mit Internet.": "Deconectarea funcționează doar cu internet. După aceea, acest telefon are nevoie de o nouă conectare cu internet.",
+ "Abmelden geht nur mit Internet. Sperren geht auch ohne.": "Deconectarea funcționează doar cu internet. Blocarea merge și fără.",
+ "Angemeldet als {0}": "Conectat ca {0}",
+ "App sperren": "Blochează aplicația",
+ "Beim nächsten Öffnen fragt die App wieder nach dem Passwort. Das geht auch ohne Internet.": "La următoarea deschidere, aplicația cere din nou parola. Merge și fără internet.",
+ "Die Anmeldung hat nicht geklappt. Bitte später noch einmal versuchen.": "Conectarea nu a reușit. Încearcă din nou mai târziu.",
+ "Dieses Handy abmelden": "Deconectează acest telefon",
+ "Dieses Handy war seit {0} nicht mehr mit dem Server verbunden. Bitte einmal mit Internet anmelden.": "Acest telefon nu a mai fost conectat la server din {0}. Conectează-te o dată cu internet.",
+ "Einen Moment …": "Un moment …",
+ "Für die erste Anmeldung braucht das Handy Internet.": "Pentru prima conectare telefonul are nevoie de internet.",
+ "Hallo {0}!": "Salut, {0}!",
+ "Kein Internet. Anmelden geht trotzdem, wenn du dich auf diesem Handy schon einmal angemeldet hast.": "Fără internet. Te poți conecta totuși dacă te-ai mai conectat pe acest telefon.",
+ "Kein Internet. Bitte versuche es gleich noch einmal.": "Fără internet. Încearcă din nou peste puțin timp.",
+ "Kein Internet. Die erste Anmeldung auf diesem Handy geht nur mit Internet.": "Fără internet. Prima conectare pe acest telefon merge doar cu internet.",
+ "Ohne Internet angemeldet. Was du einträgst, geht raus, sobald wieder Netz da ist.": "Conectat fără internet. Ce introduci se trimite imediat ce există din nou rețea.",
+ "Zu viele falsche Eingaben. Anmelden geht wieder ab {0} Uhr.": "Prea multe încercări greșite. Te poți conecta din nou de la ora {0}.",
+ "Die Anmeldung mit dem Brief ist abgelaufen. Bitte melde dich noch einmal mit dem Einmal-Passwort an.": "Conectarea cu scrisoarea a expirat. Conectează-te din nou cu parola unică."
 }

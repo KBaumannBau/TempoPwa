@@ -36,6 +36,16 @@ Pfad: `~/Developer/privat/baumann/TempoVibe` (eigenes Repo, eigenes Claude-Proje
   - `src/screens/{ma,polier,bau,pc,nu}`, `src/components/`: UI
   - `src/i18n/*.json`, `src/domain/texte/*.json`: Übersetzungen und Rechtstexte
 
+## Sprache des Codes: Englisch (verbindlich)
+
+- **Alles im Code ist englisch:** Klassen, Dateien, Ordner, Variablen, Funktionen, Tabellen, Spalten, Aufzählungswerte,
+  API-Pfade, JSON-Felder, Kommentare im Code, Testnamen. Englisch ist die Sprache der Programmierer.
+- **Deutsch bleiben** nur die sichtbaren Texte der App (über `tx('Deutscher Text')`, der deutsche Text ist der Schlüssel)
+  und die Prosa der Dokumentation in `docs/`. Dateinamen in `docs/` sind englisch.
+- Übersetzung der Fachbegriffe und der Tabellen aus dem TempoVibe-Schema: `docs/database/naming.md`.
+- Stand: Neuer Code ist englisch (Kontext `Access`, `pwa/src/auth`, Login-Bildschirme). Der Rest (Grundgerüst, `System`,
+  `i18n`, `offline`, Komponenten aus TempoVibe, CSS-Klassen) wird nach der Anmeldung in einem eigenen Schritt umbenannt.
+
 ## Aufbau des Repos
 
 ```
@@ -98,11 +108,16 @@ Ein Repo, kein Git-Submodule. API und PWA ändern sich gemeinsam in einem Commit
 **Befehle**
 - Start: `cp .env.example .env` (Werte setzen), dann `docker compose up -d`; PWA unter `http://localhost:${HTTP_PORT}`.
 - PHP: `docker compose exec php bin/console …`, `docker compose exec php composer …`, Tests `docker compose exec php vendor/bin/phpunit`
-  (vorher einmal `bin/console doctrine:database:create --env=test`).
+  (vorher einmal `bin/console doctrine:database:create --env=test` und nach jeder neuen Migration
+  `bin/console doctrine:migrations:migrate -n --env=test`).
 - PWA: `docker compose exec pwa npm run build`, Typen neu erzeugen `docker compose exec pwa npm run api:types`.
 - Prod-Modus lokal prüfen: `npm run build`, dann `PWA_MODUS=prod docker compose up -d nginx`.
-- Aufbau der API: je Kontext `src/<Kontext>/{Domain,Application,Infrastructure,Api}`; API-Resources (DTOs) und
-  State Provider/Processor unter `Api/`, Doctrine-Entities unter `Infrastructure/Doctrine/`. Beispiel: `src/System` (Health).
+- Aufbau der API: je Kontext `src/<Context>/{Domain,Application,Infrastructure,Api}`; API-Resources (DTOs) und
+  State Provider/Processor unter `Api/`. Die Domänenklassen werden per **XML-Mapping** aus
+  `Infrastructure/Doctrine/Mapping` gespeichert (keine Doctrine-Attribute in der Domäne), Repositories als
+  Interfaces in `Domain/`, Umsetzung in `Infrastructure/Doctrine/`. Beispiel: `src/Access`.
+- Datenbank: Tabellen im Schema `tempo`, Migrationen von Hand geschrieben (kein `doctrine:schema:update`/Diff).
+  `text` mit `CHECK` statt PostgreSQL-Enums.
 
 **Docker-Setup (Muster wie in den anderen Projekten, Vorlage: `als-crm-api`)**
 - Kein FrankenPHP, kein Caddy, keine Docker-Dateien aus der API-Platform-Distribution.
@@ -245,6 +260,13 @@ Konten in der eigenen Datenbank.
 - Login-Rate-Limit (Symfony RateLimiter) und Protokoll der Anmeldungen.
 - Die Anmeldung ist hinter einer Schnittstelle gekapselt, damit später ein SSO-Anbieter ergänzt werden kann,
   ohne die Fachlogik anzufassen.
+- **Umgesetzt** (Kontext `api/src/Access`, PWA `pwa/src/auth`): `POST /api/auth/login`, `POST /api/auth/password`,
+  `GET /api/auth/me`, `POST /api/auth/logout`; Geräte-Token im HttpOnly-Cookie `tempo_device` statt JWT (ADR 0004).
+  Konzept, Fehlercodes und Offline-Anmeldung: `docs/pwa/authentication.md`.
+- Erste Anmeldung nur online; danach öffnet die PWA eine gesperrte App auch offline über einen Tresor
+  (PBKDF2 + AES-GCM, `pwa/src/auth/vault.ts`). Server zuerst: Ist er erreichbar, entscheidet er.
+- Bis es die Büro-Bildschirme gibt: `bin/console tempo:access:create-person` und `bin/console tempo:access:issue-letter`.
+- Nachunternehmer-Personen kommen später (eigene Kennung als `username`, Spalte für die NU-Firma).
 
 ## Wortwahl und Daten
 

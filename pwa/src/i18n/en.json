@@ -827,5 +827,22 @@
  "offline": "offline",
  "Neue Version der App verfügbar.": "A new version of the app is available.",
  "Jetzt aktualisieren": "Update now",
- "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Something is still in progress. Update anyway?"
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Something is still in progress. Update anyway?",
+ "Abmelden geht nur mit Internet. Danach braucht dieses Handy wieder eine Anmeldung mit Internet.": "Signing out only works with internet. After that, this phone needs a new sign-in with internet.",
+ "Abmelden geht nur mit Internet. Sperren geht auch ohne.": "Signing out only works with internet. Locking also works without.",
+ "Angemeldet als {0}": "Signed in as {0}",
+ "App sperren": "Lock app",
+ "Beim nächsten Öffnen fragt die App wieder nach dem Passwort. Das geht auch ohne Internet.": "Next time you open the app, it asks for your password again. This also works without internet.",
+ "Die Anmeldung hat nicht geklappt. Bitte später noch einmal versuchen.": "Sign-in did not work. Please try again later.",
+ "Dieses Handy abmelden": "Sign out this phone",
+ "Dieses Handy war seit {0} nicht mehr mit dem Server verbunden. Bitte einmal mit Internet anmelden.": "This phone has not been connected to the server since {0}. Please sign in once with internet.",
+ "Einen Moment …": "One moment …",
+ "Für die erste Anmeldung braucht das Handy Internet.": "The phone needs internet for the first sign-in.",
+ "Hallo {0}!": "Hello {0}!",
+ "Kein Internet. Anmelden geht trotzdem, wenn du dich auf diesem Handy schon einmal angemeldet hast.": "No internet. You can still sign in if you have signed in on this phone before.",
+ "Kein Internet. Bitte versuche es gleich noch einmal.": "No internet. Please try again in a moment.",
+ "Kein Internet. Die erste Anmeldung auf diesem Handy geht nur mit Internet.": "No internet. The first sign-in on this phone only works with internet.",
+ "Ohne Internet angemeldet. Was du einträgst, geht raus, sobald wieder Netz da ist.": "Signed in without internet. What you enter is sent as soon as there is a connection again.",
+ "Zu viele falsche Eingaben. Anmelden geht wieder ab {0} Uhr.": "Too many wrong entries. You can sign in again from {0}.",
+ "Die Anmeldung mit dem Brief ist abgelaufen. Bitte melde dich noch einmal mit dem Einmal-Passwort an.": "The sign-in with the letter has expired. Please sign in again with the one-time password."
 }

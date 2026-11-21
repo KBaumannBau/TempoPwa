@@ -827,5 +827,22 @@
  "offline": "offline",
  "Neue Version der App verfügbar.": "Dostupna je nova verzija aplikacije.",
  "Jetzt aktualisieren": "Ažuriraj sada",
- "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Još nešto nije završeno. Ipak ažurirati?"
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Još nešto nije završeno. Ipak ažurirati?",
+ "Abmelden geht nur mit Internet. Danach braucht dieses Handy wieder eine Anmeldung mit Internet.": "Odjava radi samo s internetom. Nakon toga ovaj mobitel treba novu prijavu s internetom.",
+ "Abmelden geht nur mit Internet. Sperren geht auch ohne.": "Odjava radi samo s internetom. Zaključavanje radi i bez njega.",
+ "Angemeldet als {0}": "Prijavljen kao {0}",
+ "App sperren": "Zaključaj aplikaciju",
+ "Beim nächsten Öffnen fragt die App wieder nach dem Passwort. Das geht auch ohne Internet.": "Pri sljedećem otvaranju aplikacija ponovno traži lozinku. To radi i bez interneta.",
+ "Die Anmeldung hat nicht geklappt. Bitte später noch einmal versuchen.": "Prijava nije uspjela. Pokušaj ponovno kasnije.",
+ "Dieses Handy abmelden": "Odjavi ovaj mobitel",
+ "Dieses Handy war seit {0} nicht mehr mit dem Server verbunden. Bitte einmal mit Internet anmelden.": "Ovaj mobitel nije bio povezan sa serverom od {0}. Prijavi se jednom s internetom.",
+ "Einen Moment …": "Trenutak …",
+ "Für die erste Anmeldung braucht das Handy Internet.": "Za prvu prijavu mobitel treba internet.",
+ "Hallo {0}!": "Bok {0}!",
+ "Kein Internet. Anmelden geht trotzdem, wenn du dich auf diesem Handy schon einmal angemeldet hast.": "Nema interneta. Prijava ipak radi ako si se na ovom mobitelu već jednom prijavio.",
+ "Kein Internet. Bitte versuche es gleich noch einmal.": "Nema interneta. Pokušaj ponovno za trenutak.",
+ "Kein Internet. Die erste Anmeldung auf diesem Handy geht nur mit Internet.": "Nema interneta. Prva prijava na ovom mobitelu radi samo s internetom.",
+ "Ohne Internet angemeldet. Was du einträgst, geht raus, sobald wieder Netz da ist.": "Prijavljen bez interneta. Ono što uneseš šalje se čim opet bude mreže.",
+ "Zu viele falsche Eingaben. Anmelden geht wieder ab {0} Uhr.": "Previše pogrešnih unosa. Prijava je ponovno moguća od {0}.",
+ "Die Anmeldung mit dem Brief ist abgelaufen. Bitte melde dich noch einmal mit dem Einmal-Passwort an.": "Prijava s pismom je istekla. Ponovno se prijavi jednokratnom lozinkom."
 }

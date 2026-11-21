@@ -48,3 +48,13 @@ export function spracheWaehlen(s: Sprache) {
   try { localStorage.setItem(SCHLUESSEL, s); } catch { /* ohne Speicher bleibt Deutsch */ }
   location.reload();
 }
+
+/**
+ * Sprache der angemeldeten Person (vom Server, se.zugang.sprache) auf diesem Gerät übernehmen.
+ * Lädt nur neu, wenn die Seite gerade in einer anderen Sprache läuft.
+ */
+export function spracheAbgleichen(ziel: Sprache) {
+  if (!SPRACHEN.some((x) => x.code === ziel)) return;
+  if (gespeicherteSprache() !== ziel) try { localStorage.setItem(SCHLUESSEL, ziel); } catch { /* egal */ }
+  if (!nurDeutsch() && ziel !== sprache) location.reload();
+}

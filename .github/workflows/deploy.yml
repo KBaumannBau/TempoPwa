@@ -127,8 +127,10 @@ jobs:
         env:
           APP_ENV: test
 
-      - name: Testdatenbank anlegen
-        run: php bin/console doctrine:database:create --env=test --if-not-exists
+      - name: Testdatenbank anlegen und migrieren
+        run: |
+          php bin/console doctrine:database:create --env=test --if-not-exists
+          php bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration
 
       - name: PHPUnit
         run: vendor/bin/phpunit

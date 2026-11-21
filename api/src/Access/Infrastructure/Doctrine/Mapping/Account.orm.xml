@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Access\Domain\Account" table="account" schema="tempo">
+        <id name="personId" type="guid" column="person_id">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="username" type="string" length="64" unique="true"/>
+        <field name="status" type="string" enum-type="App\Access\Domain\AccountStatus"/>
+        <field name="language" type="string" enum-type="App\Access\Domain\Language"/>
+        <field name="passwordHash" column="password_hash" type="text" nullable="true"/>
+        <field name="failedAttempts" column="failed_attempts" type="integer"/>
+        <field name="lockedUntil" column="locked_until" type="datetimetz_immutable" nullable="true"/>
+        <field name="registeredAt" column="registered_at" type="datetimetz_immutable" nullable="true"/>
+        <field name="updatedAt" column="updated_at" type="datetimetz_immutable"/>
+    </entity>
+</doctrine-mapping>

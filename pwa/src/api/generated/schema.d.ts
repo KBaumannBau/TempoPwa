@@ -4,6 +4,90 @@
  */
 
 export interface paths {
+    "/api/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign in with username and password
+         * @description With the own password: the phone is registered and receives the HttpOnly cookie `tempo_device`
+         *     (valid 400 days, renewed on use). A previously registered phone of the person is signed out.
+         *
+         *     With the one-time password from the letter: `passwordChangeRequired = true` and a short-lived cookie
+         *     `tempo_registration` (10 minutes). The only next step is `POST /api/auth/password`.
+         */
+        post: operations["api_authlogin_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign out this phone
+         * @description The device is revoked immediately; the cookie is deleted.
+         */
+        post: operations["api_authlogout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Who is signed in on this phone?
+         * @description The app calls this on start and whenever it is online again. A signed-out device or a locked account is answered with 401 device_signed_out / 403 account_locked; the app then deletes its local data.
+         */
+        get: operations["api_authme_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set the own password after signing in with the letter
+         * @description Needs the cookie `tempo_registration` from `POST /api/auth/login`. Rules: at least 8 characters, one letter and one digit, not the username or the one-time password. On success the account is active and the phone receives `tempo_device`.
+         */
+        post: operations["api_authpassword_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -28,6 +112,67 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AccountView: {
+            /** @description Person id (UUID) */
+            personId: string;
+            /** @description Login name (personnel number) */
+            username: string;
+            firstName: string;
+            lastName: string;
+            /** @description Role that decides the start page, e.g. skilled_worker, site_foreman, site_manager */
+            role: string;
+            /** @description All current roles */
+            roles: string[];
+            /** @description Display language of the app: de, pl, ro, hr, en, fr, it */
+            language: string;
+        };
+        /** @description Unprocessable entity */
+        ConstraintViolation: {
+            /** @default 422 */
+            status: number;
+            violations?: {
+                /** @description The property path of the violation */
+                propertyPath: string;
+                /** @description The message associated with the violation */
+                message: string;
+                /** @description The code of the violation */
+                code?: string;
+                /** @description An extra hint to understand the violation */
+                hint?: string;
+                /** @description The serialized payload of the violation */
+                payload?: {
+                    [key: string]: unknown;
+                };
+            }[];
+            readonly detail?: string;
+            readonly type?: string;
+            readonly title?: string | null;
+            readonly instance?: string | null;
+        };
+        /** @description Unprocessable entity */
+        "ConstraintViolation.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
+            /** @default 422 */
+            status: number;
+            violations?: {
+                /** @description The property path of the violation */
+                propertyPath: string;
+                /** @description The message associated with the violation */
+                message: string;
+                /** @description The code of the violation */
+                code?: string;
+                /** @description An extra hint to understand the violation */
+                hint?: string;
+                /** @description The serialized payload of the violation */
+                payload?: {
+                    [key: string]: unknown;
+                };
+            }[];
+            readonly detail?: string;
+            readonly description?: string;
+            readonly type?: string;
+            readonly title?: string | null;
+            readonly instance?: string | null;
+        };
         /** @description A representation of common errors. */
         Error: {
             /** @description A short, human-readable summary of the problem. */
@@ -89,6 +234,59 @@ export interface components {
             "@id": string;
             "@type": string;
         };
+        Login: {
+            account: components["schemas"]["AccountView"];
+            /** @description true after signing in with the letter: set an own password next */
+            passwordChangeRequired: boolean;
+        };
+        "Login.LoginRequest": {
+            /**
+             * @description Personnel number
+             * @default
+             * @example 1001
+             */
+            username: string;
+            /**
+             * @description Own password, or the one-time password from the letter (XXXX-XXXX)
+             * @default
+             */
+            password: string;
+            /**
+             * @description Display language chosen on the device; stored with the first registration
+             * @default de
+             * @example de
+             * @enum {string}
+             */
+            language: "de" | "pl" | "ro" | "hr" | "en" | "fr" | "it";
+            /**
+             * @description Name of the phone for the device list
+             * @default Browser
+             * @example iPhone
+             */
+            deviceLabel: string;
+        };
+        /** @description Operations on the signed-in phone (authenticated by the cookie `tempo_device`). */
+        "Me.AccountView": {
+            /** @description Person id (UUID) */
+            personId: string;
+            /** @description Login name (personnel number) */
+            username: string;
+            firstName: string;
+            lastName: string;
+            /** @description Role that decides the start page, e.g. skilled_worker, site_foreman, site_manager */
+            role: string;
+            /** @description All current roles */
+            roles: string[];
+            /** @description Display language of the app: de, pl, ro, hr, en, fr, it */
+            language: string;
+        };
+        Password: {
+            /**
+             * @description New own password
+             * @default
+             */
+            newPassword: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -98,6 +296,239 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    api_authlogin_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The new Login resource */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Login.LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Login resource created */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Login"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": components["schemas"]["Error.jsonld"];
+                    "application/problem+json": components["schemas"]["Error"];
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Rejected: invalid_credentials (with remainingAttempts), registration_expired, device_signed_out or unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rejected: account_locked (locked by the office) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rejected: one_time_password_expired (letter older than 14 days) */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rejected: password_policy_violated (detail holds the rule) or invalid input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+                    "application/problem+json": components["schemas"]["ConstraintViolation"];
+                    "application/json": components["schemas"]["ConstraintViolation"];
+                };
+            };
+            /** @description Rejected: temporarily_locked (5 wrong passwords or too many attempts from this client; lockedUntil, Retry-After) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    api_authlogout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Me resource created */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": components["schemas"]["Error.jsonld"];
+                    "application/problem+json": components["schemas"]["Error"];
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Rejected: invalid_credentials (with remainingAttempts), registration_expired, device_signed_out or unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+                    "application/problem+json": components["schemas"]["ConstraintViolation"];
+                    "application/json": components["schemas"]["ConstraintViolation"];
+                };
+            };
+        };
+    };
+    api_authme_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Me resource */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me.AccountView"];
+                };
+            };
+            /** @description Rejected: invalid_credentials (with remainingAttempts), registration_expired, device_signed_out or unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rejected: account_locked (locked by the office) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": components["schemas"]["Error.jsonld"];
+                    "application/problem+json": components["schemas"]["Error"];
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    api_authpassword_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The new Password resource */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Password"];
+            };
+        };
+        responses: {
+            /** @description Password resource created */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": components["schemas"]["Error.jsonld"];
+                    "application/problem+json": components["schemas"]["Error"];
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Rejected: invalid_credentials (with remainingAttempts), registration_expired, device_signed_out or unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rejected: account_locked (locked by the office) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rejected: one_time_password_expired (letter older than 14 days) */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rejected: password_policy_violated (detail holds the rule) or invalid input */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/ld+json": components["schemas"]["ConstraintViolation.jsonld"];
+                    "application/problem+json": components["schemas"]["ConstraintViolation"];
+                    "application/json": components["schemas"]["ConstraintViolation"];
+                };
+            };
+        };
+    };
     api_health_get: {
         parameters: {
             query?: never;

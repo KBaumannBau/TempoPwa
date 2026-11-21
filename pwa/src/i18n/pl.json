@@ -827,5 +827,22 @@
  "offline": "offline",
  "Neue Version der App verfügbar.": "Dostępna jest nowa wersja aplikacji.",
  "Jetzt aktualisieren": "Aktualizuj teraz",
- "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Coś jest jeszcze w toku. Mimo to zaktualizować?"
+ "Es ist noch etwas in Arbeit. Trotzdem jetzt aktualisieren?": "Coś jest jeszcze w toku. Mimo to zaktualizować?",
+ "Abmelden geht nur mit Internet. Danach braucht dieses Handy wieder eine Anmeldung mit Internet.": "Wylogowanie działa tylko z internetem. Potem ten telefon wymaga ponownego logowania z internetem.",
+ "Abmelden geht nur mit Internet. Sperren geht auch ohne.": "Wylogowanie działa tylko z internetem. Blokada działa także bez niego.",
+ "Angemeldet als {0}": "Zalogowano jako {0}",
+ "App sperren": "Zablokuj aplikację",
+ "Beim nächsten Öffnen fragt die App wieder nach dem Passwort. Das geht auch ohne Internet.": "Przy następnym otwarciu aplikacja znów zapyta o hasło. Działa to także bez internetu.",
+ "Die Anmeldung hat nicht geklappt. Bitte später noch einmal versuchen.": "Logowanie się nie udało. Spróbuj ponownie później.",
+ "Dieses Handy abmelden": "Wyloguj ten telefon",
+ "Dieses Handy war seit {0} nicht mehr mit dem Server verbunden. Bitte einmal mit Internet anmelden.": "Ten telefon nie łączył się z serwerem od {0}. Zaloguj się raz z internetem.",
+ "Einen Moment …": "Chwileczkę …",
+ "Für die erste Anmeldung braucht das Handy Internet.": "Do pierwszego logowania telefon potrzebuje internetu.",
+ "Hallo {0}!": "Cześć {0}!",
+ "Kein Internet. Anmelden geht trotzdem, wenn du dich auf diesem Handy schon einmal angemeldet hast.": "Brak internetu. Zalogujesz się mimo to, jeśli logowałeś się już na tym telefonie.",
+ "Kein Internet. Bitte versuche es gleich noch einmal.": "Brak internetu. Spróbuj ponownie za chwilę.",
+ "Kein Internet. Die erste Anmeldung auf diesem Handy geht nur mit Internet.": "Brak internetu. Pierwsze logowanie na tym telefonie działa tylko z internetem.",
+ "Ohne Internet angemeldet. Was du einträgst, geht raus, sobald wieder Netz da ist.": "Zalogowano bez internetu. To, co wpiszesz, zostanie wysłane, gdy tylko wróci sieć.",
+ "Zu viele falsche Eingaben. Anmelden geht wieder ab {0} Uhr.": "Zbyt wiele błędnych prób. Logowanie znów możliwe od {0}.",
+ "Die Anmeldung mit dem Brief ist abgelaufen. Bitte melde dich noch einmal mit dem Einmal-Passwort an.": "Logowanie z listem wygasło. Zaloguj się ponownie hasłem jednorazowym."
 }

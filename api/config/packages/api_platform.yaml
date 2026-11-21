@@ -4,8 +4,12 @@ api_platform:
     # Version aus der Datei VERSION (siehe Kernel), erscheint als Badge im Kopf von /api/docs
     version: '%app.version%'
     # Ressourcen sind eigene DTOs je Kontext (src/<Kontext>/Api/Resource), keine Doctrine-Entities.
+    # Only the resource folders: src/ also holds Doctrine XML mappings, which API Platform must not read.
+    # New context = add its Api/Resource folder here.
     mapping:
-        paths: ['%kernel.project_dir%/src']
+        paths:
+            - '%kernel.project_dir%/src/System/Api/Resource'
+            - '%kernel.project_dir%/src/Access/Api/Resource'
     formats:
         json: ['application/json']
         jsonld: ['application/ld+json']

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Access\Domain\Invitation" table="invitation" schema="tempo">
+        <id name="id" type="guid">
+            <generator strategy="NONE"/>
+        </id>
+        <field name="personId" column="person_id" type="guid"/>
+        <field name="secretHash" column="secret_hash" type="text"/>
+        <field name="issuedBy" column="issued_by" type="guid" nullable="true"/>
+        <field name="issuedAt" column="issued_at" type="datetimetz_immutable"/>
+        <field name="validUntil" column="valid_until" type="datetimetz_immutable"/>
+        <field name="usedAt" column="used_at" type="datetimetz_immutable" nullable="true"/>
+        <field name="revokedAt" column="revoked_at" type="datetimetz_immutable" nullable="true"/>
+    </entity>
+</doctrine-mapping>
