@@ -5,7 +5,7 @@
 // The device credential is an HttpOnly cookie. The app never sees it.
 
 import type { components } from '../api/generated/schema';
-import type { Sprache } from '../i18n';
+import type { Language } from '../i18n';
 import type { Account } from './account';
 
 type Schemas = components['schemas'];
@@ -76,7 +76,7 @@ function deviceLabel(): string {
 
 export const authApi = {
   /** Username with the own password or the one-time password from the letter */
-  login: (username: string, password: string, language: Sprache) =>
+  login: (username: string, password: string, language: Language) =>
     call<LoginResponse>('POST', '/api/auth/login', { username, password, language, deviceLabel: deviceLabel() } satisfies Schemas['Login.LoginRequest']),
   /** Set the own password (required after the letter) */
   setPassword: (newPassword: string) => call<undefined>('POST', '/api/auth/password', { newPassword } satisfies Schemas['Password']),

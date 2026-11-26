@@ -1,10 +1,10 @@
 #!/bin/sh
-# Startskript für nginx:
-#  1. PWA-Modus wählen (dev = Vite-Devserver, prod = statischer Build)
-#  2. optionale Basic Auth aus BASIC_AUTH_USERS ("user:pass,user:pass") erzeugen
+# Start script for nginx:
+#  1. choose the PWA mode (dev = Vite dev server, prod = static build)
+#  2. generate optional basic auth from BASIC_AUTH_USERS ("user:pass,user:pass")
 set -eu
 
-case "${PWA_MODUS:-dev}" in
+case "${PWA_MODE:-dev}" in
   prod) cp /etc/nginx/pwa/pwa-prod.conf /etc/nginx/pwa.conf ;;
   *)    cp /etc/nginx/pwa/pwa-dev.conf  /etc/nginx/pwa.conf ;;
 esac

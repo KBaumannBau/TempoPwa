@@ -1,140 +1,140 @@
-/* Grundstile. Farben und Maße aus TempoVibe (src/styles.css, Entwurf V2); der Rest kommt mit den Bildschirmen. */
+/* Base styles. Colours and sizes from TempoVibe (src/styles.css, draft V2); the rest comes with the screens. */
 :root {
-  --blau: #0077c8;
-  --blau-dunkel: #005a8c;
-  --blau-hell: #e6f1f9;
+  --blue: #0077c8;
+  --blue-dark: #005a8c;
+  --blue-light: #e6f1f9;
   --text: #14212b;
   --text-2: #44505a;
-  --rand: #dde3e8;
-  --grund: #f3f5f7;
-  --weiss: #ffffff;
-  --orange-dunkel: #5c3200;
-  --orange-hell: #fff1dc;
-  --gruen: #3e7a0e;
-  --gruen-text: #2f5e0a;
-  --gruen-hell: #eaf4e0;
-  --rot: #b3261e;
-  --feld: #8a96a0;
-  --grau: #c5ced6;
-  --kopf: 56px;
+  --border: #dde3e8;
+  --background: #f3f5f7;
+  --white: #ffffff;
+  --orange-dark: #5c3200;
+  --orange-light: #fff1dc;
+  --green: #3e7a0e;
+  --green-text: #2f5e0a;
+  --green-light: #eaf4e0;
+  --red: #b3261e;
+  --field-border: #8a96a0;
+  --grey: #c5ced6;
+  --header-height: 56px;
   font-family: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
-  background: var(--grund);
+  background: var(--background);
   -webkit-text-size-adjust: 100%;
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
 button, input, select, textarea { font: inherit; color: inherit; }
-a { color: var(--blau); }
-:focus-visible { outline: 3px solid var(--blau); outline-offset: 2px; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 
-/* Blaue Kopfleiste wie in TempoVibe. In der installierten App auf dem iPhone liegt die Statusleiste
-   über der Kopfleiste (black-translucent), deshalb der Abstand safe-area-inset-top. */
-.kopf {
+/* Blue header as in TempoVibe. In the installed app on the iPhone the status bar lies
+   over the header (black-translucent), hence the safe-area-inset-top padding. */
+.header {
   position: sticky; top: 0; z-index: 5; flex-shrink: 0;
-  height: calc(var(--kopf) + env(safe-area-inset-top));
+  height: calc(var(--header-height) + env(safe-area-inset-top));
   padding: env(safe-area-inset-top) 12px 0 16px;
-  background: var(--blau); color: var(--weiss);
+  background: var(--blue); color: var(--white);
   display: flex; align-items: center; justify-content: space-between;
 }
-.kopf-logo { color: var(--weiss); display: block; }
-.kopf-rechts { display: flex; align-items: center; gap: 4px; }
-.kopf-offline {
+.header-logo { color: var(--white); display: block; }
+.header-right { display: flex; align-items: center; gap: 4px; }
+.header-offline {
   font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 12px;
-  background: rgba(255, 255, 255, 0.18); color: var(--weiss);
+  background: rgba(255, 255, 255, 0.18); color: var(--white);
 }
 
-.aktualisierung {
+.update-notice {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  padding: 10px 16px; background: var(--blau-hell); color: var(--blau-dunkel); font-weight: 600;
+  padding: 10px 16px; background: var(--blue-light); color: var(--blue-dark); font-weight: 600;
 }
-.aktualisierung button {
+.update-notice button {
   min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; cursor: pointer;
-  background: var(--blau); color: var(--weiss); font-weight: 700;
+  background: var(--blue); color: var(--white); font-weight: 700;
 }
 
-.rahmen { min-height: 100dvh; display: flex; flex-direction: column; }
-.rahmen > .rahmen-inhalt { flex: 1; }
+.layout { min-height: 100dvh; display: flex; flex-direction: column; }
+.layout > .layout-content { flex: 1; }
 
-.fehler { color: var(--rot); }
+.error { color: var(--red); }
 
-/* Handy-Spalte wie in TempoVibe (.screen, main.inhalt): am Handy volle Breite, am PC eine Spalte in Handy-Breite */
-.rahmen-inhalt { display: flex; flex-direction: column; width: 100%; max-width: 430px; margin: 0 auto; }
-main.inhalt { flex: 1 1 auto; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 14px; }
-main.inhalt > * { flex-shrink: 0; }
-.spalte { flex: 1 1 auto; display: flex; flex-direction: column; gap: 14px; }
-.fueller { flex-grow: 1; }
+/* Phone column as in TempoVibe: full width on the phone, a phone-wide column on the PC */
+.layout-content { display: flex; flex-direction: column; width: 100%; max-width: 430px; margin: 0 auto; }
+main.content { flex: 1 1 auto; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+main.content > * { flex-shrink: 0; }
+.column { flex: 1 1 auto; display: flex; flex-direction: column; gap: 14px; }
+.spacer { flex-grow: 1; }
 
 h1.h1 { margin: 0; font-family: Archivo, sans-serif; font-weight: 800; font-size: 24px; line-height: 1.2; }
-h1.h1.gross { font-size: 26px; }
-.unter { font-size: 15px; color: var(--text-2); }
-.klein { font-size: 14px; color: var(--text-2); }
+h1.h1.large { font-size: 26px; }
+.subtitle { font-size: 15px; color: var(--text-2); }
+.small { font-size: 14px; color: var(--text-2); }
 .text { margin: 0; font-size: 15px; line-height: 1.45; color: var(--text-2); }
-.text.mitte { text-align: center; }
-.kopfzeilen { display: flex; flex-direction: column; gap: 2px; }
-.fett { font-weight: 700; }
+.text.center { text-align: center; }
+.headings { display: flex; flex-direction: column; gap: 2px; }
+.bold { font-weight: 700; }
 
-.karte { background: var(--weiss); border: 1px solid var(--rand); border-radius: 12px; }
-.karte.pad { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
-.karte dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0; }
-.karte dt { color: var(--text-2); }
-.karte dd { margin: 0; font-weight: 600; }
+.card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; }
+.card.pad { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.card dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0; }
+.card dt { color: var(--text-2); }
+.card dd { margin: 0; font-weight: 600; }
 
-.hinweis { border-radius: 12px; padding: 12px 14px; font-size: 16px; line-height: 1.4; background: var(--blau-hell); color: var(--blau-dunkel); }
-.hinweis.orange { background: var(--orange-hell); color: var(--orange-dunkel); }
-.hinweis.gruen { background: var(--gruen-hell); color: var(--gruen-text); }
-.hinweis.blau { background: var(--blau-hell); color: var(--blau-dunkel); }
+.notice { border-radius: 12px; padding: 12px 14px; font-size: 16px; line-height: 1.4; background: var(--blue-light); color: var(--blue-dark); }
+.notice.orange { background: var(--orange-light); color: var(--orange-dark); }
+.notice.green { background: var(--green-light); color: var(--green-text); }
+.notice.blue { background: var(--blue-light); color: var(--blue-dark); }
 
-.knopf {
+.button {
   min-height: 60px; border-radius: 14px; border: 0; padding: 0 16px;
   display: flex; align-items: center; justify-content: center; gap: 10px;
   font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px; text-decoration: none; cursor: pointer; text-align: center;
 }
-.knopf.blau { background: var(--blau); color: var(--weiss); }
-.knopf.gruen { background: var(--gruen); color: var(--weiss); }
-.knopf.dunkel { background: var(--text); color: var(--weiss); }
-.knopf.rot { background: var(--rot); color: var(--weiss); }
-.knopf.rahmen { background: var(--weiss); border: 2px solid var(--blau); color: var(--blau); }
-.knopf:hover { filter: brightness(1.06); }
-.knopf[aria-disabled='true'] { background: var(--grau); color: var(--text-2); border: 0; cursor: not-allowed; filter: none; }
+.button.blue { background: var(--blue); color: var(--white); }
+.button.green { background: var(--green); color: var(--white); }
+.button.dark { background: var(--text); color: var(--white); }
+.button.red { background: var(--red); color: var(--white); }
+.button.outline { background: var(--white); border: 2px solid var(--blue); color: var(--blue); }
+.button:hover { filter: brightness(1.06); }
+.button[aria-disabled='true'] { background: var(--grey); color: var(--text-2); border: 0; cursor: not-allowed; filter: none; }
 
 .link {
   align-self: flex-start; min-height: 44px; display: inline-flex; align-items: center; gap: 6px;
-  font-size: 16px; font-weight: 700; background: transparent; border: 0; padding: 0; color: var(--blau); cursor: pointer; text-decoration: none;
+  font-size: 16px; font-weight: 700; background: transparent; border: 0; padding: 0; color: var(--blue); cursor: pointer; text-decoration: none;
 }
 .link:hover { text-decoration: underline; }
-.link.mitte { align-self: center; }
+.link.center { align-self: center; }
 
-.feld { display: flex; flex-direction: column; gap: 6px; }
-.feld label { font-size: 15px; font-weight: 700; }
-.feld-reihe { display: flex; gap: 8px; }
-.feld-reihe .eingabe { flex: 1; }
-.eingabe {
-  height: 52px; width: 100%; border: 1px solid var(--feld); border-radius: 10px; padding: 0 12px;
-  font-size: 17px; background: var(--weiss); color: var(--text);
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 15px; font-weight: 700; }
+.field-row { display: flex; gap: 8px; }
+.field-row .input { flex: 1; }
+.input {
+  height: 52px; width: 100%; border: 1px solid var(--field-border); border-radius: 10px; padding: 0 12px;
+  font-size: 17px; background: var(--white); color: var(--text);
 }
 
-/* Sprachwahl in der Kopfleiste wie in TempoVibe */
-.kopf-knopf {
-  min-width: 44px; height: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--weiss);
+/* Language picker in the header as in TempoVibe */
+.header-button {
+  min-width: 44px; height: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--white);
   display: flex; align-items: center; justify-content: center; gap: 4px; font-weight: 700; font-size: 15px; cursor: pointer; border-radius: 10px;
 }
-.kopf-knopf:hover { background: rgba(255, 255, 255, 0.12); }
-.sprach-wahl {
-  position: absolute; top: calc(var(--kopf) + env(safe-area-inset-top) - 4px); right: 8px; z-index: 20; width: min(320px, calc(100vw - 16px));
-  background: var(--weiss); color: var(--text); border-radius: 14px; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+.header-button:hover { background: rgba(255, 255, 255, 0.12); }
+.language-picker {
+  position: absolute; top: calc(var(--header-height) + env(safe-area-inset-top) - 4px); right: 8px; z-index: 20; width: min(320px, calc(100vw - 16px));
+  background: var(--white); color: var(--text); border-radius: 14px; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
   padding: 14px; display: flex; flex-direction: column; gap: 8px;
 }
-.sprach-wahl ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.sprach-wahl button {
+.language-picker ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.language-picker button {
   width: 100%; min-height: 48px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border: 1px solid #d5dde5; border-radius: 10px;
-  background: var(--weiss); font-size: 17px; text-align: left; cursor: pointer;
+  background: var(--white); font-size: 17px; text-align: left; cursor: pointer;
 }
-.sprach-wahl button[aria-pressed='true'] { background: var(--blau-hell); border-color: var(--blau); font-weight: 700; }
-.sprach-wahl .code { font-weight: 800; color: var(--blau-dunkel); min-width: 28px; }
+.language-picker button[aria-pressed='true'] { background: var(--blue-light); border-color: var(--blue); font-weight: 700; }
+.language-picker .code { font-weight: 800; color: var(--blue-dark); min-width: 28px; }
 
-.fusszeile {
+.footer {
   display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem 1rem;
   padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
-  font-size: 0.8rem; color: var(--text-2); border-top: 1px solid var(--rand);
+  font-size: 0.8rem; color: var(--text-2); border-top: 1px solid var(--border);
 }

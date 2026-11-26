@@ -1,15 +1,15 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import { SessionProvider } from './auth/session';
-import { Rahmen } from './components/Rahmen';
+import { Layout } from './components/Layout';
 import { Home } from './screens/Home';
 import { Login } from './screens/Login';
 import { Registration } from './screens/Registration';
 
 // Routes as in TempoVibe (src/App.tsx), with real paths instead of hash routing.
-// Screens are added chain by chain, status: docs/uebernahme.md.
+// Screens are added chain by chain, status: docs/porting-status.md.
 const router = createBrowserRouter([
   {
-    element: <Rahmen />,
+    element: <Layout />,
     children: [
       { path: '/', element: <Login /> },
       { path: '/registration', element: <Registration /> },

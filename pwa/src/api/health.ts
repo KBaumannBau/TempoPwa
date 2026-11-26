@@ -4,26 +4,26 @@ import type { components } from './generated/schema';
 
 export type Health = components['schemas']['Health'];
 
-export type HealthZustand =
-  | { art: 'laedt' }
-  | { art: 'ok'; health: Health }
-  | { art: 'fehler'; text: string };
+export type HealthState =
+  | { kind: 'loading' }
+  | { kind: 'ok'; health: Health }
+  | { kind: 'error'; text: string };
 
-/** Ruft GET /api/health einmal ab (Startseite, Fußzeile). */
-export function useHealth(): HealthZustand {
-  const [zustand, setZustand] = useState<HealthZustand>({ art: 'laedt' });
+/** Fetches GET /api/health once (start page, footer). */
+export function useHealth(): HealthState {
+  const [state, setState] = useState<HealthState>({ kind: 'loading' });
 
   useEffect(() => {
-    let aktiv = true;
+    let active = true;
     api.GET('/api/health')
       .then(({ data, error, response }) => {
-        if (!aktiv) return;
-        if (data) setZustand({ art: 'ok', health: data });
-        else setZustand({ art: 'fehler', text: `HTTP ${response.status}${error ? ` – ${JSON.stringify(error)}` : ''}` });
+        if (!active) return;
+        if (data) setState({ kind: 'ok', health: data });
+        else setState({ kind: 'error', text: `HTTP ${response.status}${error ? ` – ${JSON.stringify(error)}` : ''}` });
       })
-      .catch((e: unknown) => aktiv && setZustand({ art: 'fehler', text: e instanceof Error ? e.message : String(e) }));
-    return () => { aktiv = false; };
+      .catch((e: unknown) => active && setState({ kind: 'error', text: e instanceof Error ? e.message : String(e) }));
+    return () => { active = false; };
   }, []);
 
-  return zustand;
+  return state;
 }

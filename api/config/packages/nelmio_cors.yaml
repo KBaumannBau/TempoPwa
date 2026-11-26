@@ -2,8 +2,8 @@ nelmio_cors:
     defaults:
         origin_regex: true
         allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
-        # Die PWA schickt bei fremder API-Domain credentials: 'include' (Cookie-Anmeldung, ADR 0002).
-        # Ohne diesen Header verwirft der Browser die Antwort. Erlaubt sind nur die Origins aus CORS_ALLOW_ORIGIN.
+        # With an API on another domain the PWA sends credentials: 'include' (cookie sign-in, ADR 0002).
+        # Without this header the browser drops the response. Only the origins from CORS_ALLOW_ORIGIN are allowed.
         allow_credentials: true
         allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
         allow_headers: ['Content-Type', 'Authorization']

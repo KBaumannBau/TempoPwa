@@ -1,4 +1,4 @@
-// Logo K. Baumann (weiß), übernommen aus TempoVibe (src/components/Logo.tsx, Entwurf V2)
+// K. Baumann logo (white), taken over from TempoVibe (src/components/Logo.tsx, draft V2)
 export function Logo() {
   return (
     <svg role="img" aria-label="K. Baumann" width="132" height="22" viewBox="95 92 606 101" style={{ display: 'block' }}>

@@ -3,10 +3,10 @@ import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import './styles.css';
 
-const wurzel = document.getElementById('root');
-if (!wurzel) throw new Error('#root fehlt in index.html');
+const root = document.getElementById('root');
+if (!root) throw new Error('#root is missing in index.html');
 
-createRoot(wurzel).render(
+createRoot(root).render(
   <StrictMode>
     <App />
   </StrictMode>,

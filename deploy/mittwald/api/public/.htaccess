@@ -1,5 +1,5 @@
-# Tempo-API auf Mittwald (Apache) – Front-Controller für Symfony
-# Lokal läuft nginx (docker/nginx/conf); diese Datei kommt nur beim Deploy nach api/public/.
+# Tempo API on Mittwald (Apache) – front controller for Symfony
+# Locally nginx runs (docker/nginx/conf); this file is only copied to api/public/ during the deploy.
 DirectoryIndex index.php
 Options -Indexes
 
@@ -10,19 +10,19 @@ Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Basis-Pfad ermitteln (funktioniert auch in einem Unterordner)
+    # Determine the base path (also works in a subfolder)
     RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$
     RewriteRule .* - [E=BASE:%1]
 
-    # Authorization-Header an PHP durchreichen
+    # Pass the Authorization header on to PHP
     RewriteCond %{HTTP:Authorization} .+
     RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
 
-    # /index.php/… auf die saubere Adresse umleiten
+    # Redirect /index.php/… to the clean address
     RewriteCond %{ENV:REDIRECT_STATUS} =""
     RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]
 
-    # Vorhandene Dateien (z. B. /bundles/…) direkt ausliefern, sonst Symfony
+    # Serve existing files (e.g. /bundles/…) directly, otherwise Symfony
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
     RewriteRule ^ %{ENV:BASE}/index.php [L]

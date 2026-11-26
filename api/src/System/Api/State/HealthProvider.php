@@ -8,9 +8,9 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\System\Api\Resource\Health;
 use Doctrine\DBAL\Connection;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * @implements ProviderInterface<Health>
@@ -28,22 +28,22 @@ final readonly class HealthProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Health
     {
-        $datenbank = $this->datenbankErreichbar() ? 'ok' : 'gestoert';
+        $databaseReachable = $this->isDatabaseReachable();
 
         return new Health(
-            status: $datenbank === 'ok' ? 'ok' : 'gestoert',
-            datenbank: $datenbank,
-            zeit: $this->clock->now()->setTimezone(new \DateTimeZone('UTC')),
+            status: $databaseReachable ? Health::OK : Health::DEGRADED,
+            database: $databaseReachable ? Health::OK : Health::UNAVAILABLE,
+            time: $this->clock->now()->setTimezone(new \DateTimeZone('UTC')),
             version: $this->version,
         );
     }
 
-    private function datenbankErreichbar(): bool
+    private function isDatabaseReachable(): bool
     {
         try {
             return (int) $this->connection->fetchOne('SELECT 1') === 1;
         } catch (\Throwable $e) {
-            $this->logger->error('Health: Datenbank nicht erreichbar', ['exception' => $e]);
+            $this->logger->error('Health: database not reachable', ['exception' => $e]);
 
             return false;
         }

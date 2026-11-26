@@ -10,12 +10,12 @@ final class HealthTest extends ApiTestCase
 {
     protected static ?bool $alwaysBootKernel = true;
 
-    public function testHealthMeldetOkUndVersion(): void
+    public function testHealthReportsOkAndVersion(): void
     {
-        $antwort = static::createClient()->request('GET', '/api/health', ['headers' => ['Accept' => 'application/json']]);
+        $response = static::createClient()->request('GET', '/api/health', ['headers' => ['Accept' => 'application/json']]);
 
         self::assertResponseIsSuccessful();
-        self::assertJsonContains(['status' => 'ok', 'datenbank' => 'ok']);
-        self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+/', (string) $antwort->toArray()['version']);
+        self::assertJsonContains(['status' => 'ok', 'database' => 'ok']);
+        self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+/', (string) $response->toArray()['version']);
     }
 }

@@ -15,41 +15,41 @@ class Kernel extends BaseKernel
     use MicroKernelTrait;
 
     /**
-     * Mögliche Orte der Versionsdatei: im Deploy-Paket liegt sie in api/ (von der Pipeline mit
-     * Build-Kennung geschrieben), im Repo im Wurzelordner (gepflegt von deployment.sh).
+     * Possible locations of the version file: in the deploy package it sits in api/ (written by the pipeline
+     * with the build id), in the repo in the root folder (maintained by deployment.sh).
      *
      * @return list<string>
      */
-    private function versionsDateien(): array
+    private function versionFiles(): array
     {
         return [$this->getProjectDir().'/VERSION', \dirname($this->getProjectDir()).'/VERSION'];
     }
 
     /**
-     * Version der Anwendung als Parameter %app.version% (Swagger-Kopf, Health).
+     * Application version as parameter %app.version% (Swagger header, health).
      *
      * @return array<string, mixed>
      */
     protected function getKernelParameters(): array
     {
-        $parameter = parent::getKernelParameters();
-        $parameter['app.version'] = 'unbekannt';
+        $parameters = parent::getKernelParameters();
+        $parameters['app.version'] = 'unknown';
 
-        foreach ($this->versionsDateien() as $datei) {
-            if (is_file($datei)) {
-                $parameter['app.version'] = trim((string) file_get_contents($datei)) ?: 'unbekannt';
+        foreach ($this->versionFiles() as $file) {
+            if (is_file($file)) {
+                $parameters['app.version'] = trim((string) file_get_contents($file)) ?: 'unknown';
                 break;
             }
         }
 
-        return $parameter;
+        return $parameters;
     }
 
     protected function build(ContainerBuilder $container): void
     {
-        // Ändert sich die Versionsdatei, baut Symfony den Container (dev) neu auf
-        foreach ($this->versionsDateien() as $datei) {
-            $container->addResource(is_file($datei) ? new FileResource($datei) : new FileExistenceResource($datei));
+        // When the version file changes, Symfony rebuilds the container (dev)
+        foreach ($this->versionFiles() as $file) {
+            $container->addResource(is_file($file) ? new FileResource($file) : new FileExistenceResource($file));
         }
     }
 

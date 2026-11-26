@@ -22,7 +22,7 @@ Die PWA soll sich per Cookie anmelden (HttpOnly, SameSite) und offline stempeln 
    - `/api`, `/bundles`, `/_profiler`, `/_wdt` → FastCGI an `php:9000` (Document Root `api/public`)
    - `/` → dev: Proxy auf den Vite-Devserver `pwa:5173` inkl. HMR-Websocket; prod: statischer Build `pwa/dist`
      (`try_files $uri /index.html`, `sw.js`/`index.html`/Manifest ohne Cache)
-   - Umschalten über `PWA_MODUS=dev|prod` (`docker/nginx/start.sh`).
+   - Umschalten über `PWA_MODE=dev|prod` (`docker/nginx/start.sh`).
 4. **Keine Geheimnisse in versionierten Dateien.** `compose.yaml` ist versioniert und liest alles aus `.env`
    (ignoriert); Pflichtwerte brechen den Start mit Meldung ab. Vorlage: `.env.example`.
 5. Node läuft nur im Container (`node:22`), `node_modules` liegt im Bind-Mount, damit die IDE die Typen sieht.

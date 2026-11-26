@@ -14,7 +14,7 @@
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
         <server name="APP_ENV" value="test" force="true" />
-        <!-- Der php-Container setzt APP_ENV=dev als echte Umgebungsvariable; für Tests überschreiben -->
+        <!-- The php container sets APP_ENV=dev as a real environment variable; override it for tests -->
         <env name="APP_ENV" value="test" force="true" />
         <env name="APP_DEBUG" value="1" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />

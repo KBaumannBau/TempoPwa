@@ -1,17 +1,17 @@
-// Typisierter Zugriff auf die Tempo-API.
-// Die Typen in ./generated werden aus dem OpenAPI-Schema erzeugt: npm run api:types
-// (nicht von Hand ändern).
+// Typed access to the Tempo API.
+// The types in ./generated are generated from the OpenAPI schema: npm run api:types
+// (do not edit by hand).
 //
-// Standard ist derselbe Origin wie die PWA (lokal über nginx, siehe ADR 0001): keine Basis-URL, kein CORS.
-// Liegt die API unter einer anderen Domain (VITE_API_URL beim Build), gehen die Anfragen dorthin;
-// die API muss den Origin der PWA dann per CORS_ALLOW_ORIGIN zulassen.
+// Default is the same origin as the PWA (locally via nginx, see ADR 0001): no base URL, no CORS.
+// If the API lives on another domain (VITE_API_URL at build time), requests go there;
+// the API must then allow the origin of the PWA via CORS_ALLOW_ORIGIN.
 import createClient from 'openapi-fetch';
 import type { paths } from './generated/schema';
 
-const basis = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '');
+const baseUrl = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '');
 
 export const api = createClient<paths>({
-  baseUrl: basis,
-  credentials: basis ? 'include' : 'same-origin',
+  baseUrl,
+  credentials: baseUrl ? 'include' : 'same-origin',
   headers: { Accept: 'application/json' },
 });

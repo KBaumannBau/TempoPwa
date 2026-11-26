@@ -1,6 +1,6 @@
 // First screen of the app: sign in with username and password.
 // Model: TempoVibe src/screens/Zugang.tsx · Sperre. The person picker of TempoVibe src/screens/Anmeldung.tsx
-// is demo only and not taken over (docs/uebernahme.md).
+// is demo only and not taken over (docs/porting-status.md).
 //
 // Online the server decides. Without network the app opens the vault on the phone if this person has signed in
 // here online before (docs/pwa/authentication.md).
@@ -10,7 +10,7 @@ import { Link, Navigate, useNavigate } from 'react-router';
 import { Button, Loading, Page, PasswordField, Spacer } from '../components/Controls';
 import { tx } from '../i18n';
 import { useOnline } from '../offline/online';
-import { useBeschaeftigt } from '../offline/ruhe';
+import { useBusy } from '../offline/idle';
 import { useSession } from '../auth/session';
 import { vaultUsername } from '../auth/vault';
 
@@ -24,7 +24,7 @@ export function Login() {
   const [blocked, setBlocked] = useState(false);
   const [busy, setBusy] = useState(false);
   const [forgotten, setForgotten] = useState(false);
-  useBeschaeftigt(busy);
+  useBusy(busy);
 
   // Whoever signed in here before does not need to type the username again
   useEffect(() => { void vaultUsername().then((u) => u && setUsername((current) => current || u)); }, []);
@@ -50,28 +50,28 @@ export function Login() {
 
   return (
     <Page title={tx('Anmelden')}>
-      <form className="spalte" onSubmit={(e) => void submit(e)} noValidate>
+      <form className="column" onSubmit={(e) => void submit(e)} noValidate>
         <h1 className="h1">{tx('Anmelden')}</h1>
         {session.reason === 'device_signed_out' && (
-          <div className="hinweis orange" role="status"><strong>{tx('Dieses Handy ist abgemeldet')}</strong> {tx('Es wurde von dir oder von der Lohnbuchhaltung abgemeldet. Von hier kann nichts mehr gesendet werden.')}</div>
+          <div className="notice orange" role="status"><strong>{tx('Dieses Handy ist abgemeldet')}</strong> {tx('Es wurde von dir oder von der Lohnbuchhaltung abgemeldet. Von hier kann nichts mehr gesendet werden.')}</div>
         )}
         {session.reason === 'account_locked' && (
-          <div className="hinweis orange" role="status">{tx('Dein Zugang ist gesperrt. Bitte melde dich in der Lohnbuchhaltung.')}</div>
+          <div className="notice orange" role="status">{tx('Dein Zugang ist gesperrt. Bitte melde dich in der Lohnbuchhaltung.')}</div>
         )}
         <p className="text">{tx('Nur nötig auf einem neuen Handy oder nachdem du dich abgemeldet hast. Danach bleibt dieses Handy angemeldet.')}</p>
-        {!online && <div className="hinweis blau" role="status">{tx('Kein Internet. Anmelden geht trotzdem, wenn du dich auf diesem Handy schon einmal angemeldet hast.')}</div>}
-        <div className="feld">
+        {!online && <div className="notice blue" role="status">{tx('Kein Internet. Anmelden geht trotzdem, wenn du dich auf diesem Handy schon einmal angemeldet hast.')}</div>}
+        <div className="field">
           <label htmlFor="login-username">{tx('Benutzername')}</label>
-          <input id="login-username" className="eingabe" autoComplete="username" autoCapitalize="characters" autoCorrect="off" spellCheck={false}
+          <input id="login-username" className="input" autoComplete="username" autoCapitalize="characters" autoCorrect="off" spellCheck={false}
             value={username} onChange={(e) => { setUsername(e.target.value); setMessage(''); setBlocked(false); }} />
         </div>
         <PasswordField label={tx('Passwort')} value={password} onChange={(v) => { setPassword(v); setMessage(''); }} autoComplete="current-password" />
-        {message && <div className="hinweis orange" role="alert">{message}</div>}
+        {message && <div className="notice orange" role="alert">{message}</div>}
         <Button type="submit" disabled={!username.trim() || !password || blocked || busy}>{busy ? tx('Einen Moment …') : tx('Anmelden')}</Button>
-        <button type="button" className="link mitte" aria-expanded={forgotten} onClick={() => setForgotten(!forgotten)}>{tx('Passwort vergessen?')}</button>
-        {forgotten && <div className="hinweis blau">{tx('Melde dich bei der Lohnbuchhaltung oder sag deinem Polier Bescheid. Du bekommst einen neuen Brief mit Einmal-Passwort per Post. Dein altes Passwort gilt dann nicht mehr.')}</div>}
+        <button type="button" className="link center" aria-expanded={forgotten} onClick={() => setForgotten(!forgotten)}>{tx('Passwort vergessen?')}</button>
+        {forgotten && <div className="notice blue">{tx('Melde dich bei der Lohnbuchhaltung oder sag deinem Polier Bescheid. Du bekommst einen neuen Brief mit Einmal-Passwort per Post. Dein altes Passwort gilt dann nicht mehr.')}</div>}
         <Spacer />
-        <Link className="knopf rahmen" to="/registration">{tx('Erste Anmeldung mit Brief')}</Link>
+        <Link className="button outline" to="/registration">{tx('Erste Anmeldung mit Brief')}</Link>
       </form>
     </Page>
   );

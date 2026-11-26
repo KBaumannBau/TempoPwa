@@ -1,5 +1,5 @@
-# Shell im php-Container (User www, Home = docker/php/home/)
-# Start: docker compose exec php bash   –   Übersicht: help
+# Shell in the php container (user www, home = docker/php/home/)
+# Start: docker compose exec php bash   –   overview: help
 
 API_DIR=/var/www/html/api
 
@@ -14,7 +14,7 @@ alias ls='ls $LS_OPTIONS'
 alias ll='ls $LS_OPTIONS -l'
 alias l='ls $LS_OPTIONS -lA'
 
-# --- Symfony-Konsole von überall ------------------------------------------------
+# --- Symfony console from anywhere ----------------------------------------------
 function console() {
   pushd . >/dev/null
   cd "$API_DIR" || return
@@ -36,7 +36,7 @@ alias oas="c api:openapi:export --yaml"
 alias health="curl -s http://nginx:8001/api/health; echo"
 alias log="tail -f $API_DIR/var/log/dev.log"
 
-# --- Doctrine & Datenbank (Schema nur über Migrationen) ---------------------------
+# --- Doctrine & database (schema via migrations only) ------------------------------
 alias cdmd="c doctrine:migrations:diff"
 alias cdmg="c doctrine:migrations:generate"
 alias cdmm="c doctrine:migrations:migrate --no-interaction"
@@ -52,13 +52,13 @@ alias update="cd $API_DIR && composer up"
 alias test="cd $API_DIR && php bin/phpunit --display-notices --display-deprecations --display-warnings --display-phpunit-notices"
 alias report="cd $API_DIR && php -d xdebug.mode=coverage bin/phpunit --coverage-clover=$API_DIR/var/coverage/coverage.xml --coverage-html=$API_DIR/var/coverage"
 
-# Test-Datenbank anlegen (falls nötig) und auf den Stand der Migrationen bringen
+# Create the test database (if needed) and bring it up to date with the migrations
 function testdb() {
   c doctrine:database:create --env=test --if-not-exists \
     && c doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration
 }
 
-# Einmalige Einrichtung nach dem ersten "docker compose up -d"
+# One-time setup after the first "docker compose up -d"
 function install() {
   pushd . >/dev/null
   cd "$API_DIR" || return
@@ -68,7 +68,7 @@ function install() {
   popd >/dev/null || return
 }
 
-# --- Autovervollständigung für die Aliase ----------------------------------------------
+# --- Completion for the aliases -------------------------------------------------------
 _alias_completion() {
   local cur=""
   if [[ -v COMP_WORDS ]]; then
@@ -80,7 +80,7 @@ _alias_completion() {
 }
 complete -F _alias_completion -E
 
-# --- Übersicht ---------------------------------------------------------------------------
+# --- Overview ----------------------------------------------------------------------------
 function _cmd() {
   printf "  \e[33m%-8s\e[0m - %s\n" "$1" "$2"
 }

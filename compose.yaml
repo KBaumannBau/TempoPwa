@@ -1,9 +1,9 @@
 # Tempo – Stundenerfassung K. Baumann Bau
-# Dienste: nginx (Einstieg, ein Origin), php (PHP-FPM, Symfony + API Platform),
-#          database (PostgreSQL 17), pwa (Vite-Devserver, nur dev).
+# Services: nginx (entry, one origin), php (PHP-FPM, Symfony + API Platform),
+#           database (PostgreSQL 17), pwa (Vite dev server, dev only).
 #
-# Keine Geheimnisse in dieser Datei. Alle Werte kommen aus .env (ignoriert),
-# Vorlage: .env.example. Pflichtwerte brechen den Start mit Meldung ab (${VAR:?}).
+# No secrets in this file. All values come from .env (ignored),
+# template: .env.example. Required values stop the start with a message (${VAR:?}).
 
 name: tempo
 
@@ -29,9 +29,9 @@ services:
       - .:/var/www/html:cached
       - ./log:/var/log/nginx
     environment:
-      # dev = Proxy auf den Vite-Devserver (HMR), prod = statischer Build aus pwa/dist
-      PWA_MODUS: ${PWA_MODUS:-dev}
-      # Optional für Testinstanzen: "user:pass,user:pass" – leer = keine Basic Auth
+      # dev = proxy to the Vite dev server (HMR), prod = static build from pwa/dist
+      PWA_MODE: ${PWA_MODE:-dev}
+      # Optional for test instances: "user:pass,user:pass" – empty = no basic auth
       BASIC_AUTH_USERS: ${BASIC_AUTH_USERS:-}
     command: ["/bin/sh", "/usr/local/bin/tempo-start.sh"]
     depends_on:
@@ -95,11 +95,11 @@ services:
     volumes:
       - .:/var/www/html:cached
     environment:
-      # Port, unter dem der Browser nginx erreicht (für den HMR-Websocket)
+      # Port on which the browser reaches nginx (for the HMR websocket)
       HTTP_PORT: ${HTTP_PORT:-8011}
-      # Auf Dateisystemen ohne Datei-Ereignisse: VITE_POLLING=1
+      # On file systems without file events: VITE_POLLING=1
       VITE_POLLING: ${VITE_POLLING:-0}
-      # Quelle für "npm run api:types" (innerhalb des Docker-Netzes)
+      # Source for "npm run api:types" (inside the Docker network)
       API_SCHEMA_URL: http://nginx:8001/api/docs.jsonopenapi
     command: ["sh", "-c", "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"]
     restart: unless-stopped

@@ -46,3 +46,23 @@ abrechnung → `billing`, arbeitsvorbereitung → `work_preparation`, einkauf �
 | Ausgang (Offline-Warteschlange) | outbox |
 | Lesestand | read model |
 | Tresor (Offline-Anmeldung) | vault |
+
+## PWA: Ordner, Komponenten, CSS (aus TempoVibe)
+
+Die Pfade der App (`/ma/…`, `/p/…`, `/b/…`, `/pc/…`, `/nu/…`) bleiben wie in TempoVibe, sie sind Adressen und keine Bezeichner.
+
+| TempoVibe | Tempo |
+|---|---|
+| `screens/ma`, `screens/polier`, `screens/bau`, `screens/pc`, `screens/nu` | `screens/worker`, `screens/site-foreman`, `screens/site-manager`, `screens/office`, `screens/subcontractor` |
+| `Rahmen`, `Kopf`, Fußzeile, Hinweis auf neue Version | `Layout`, `Header`, `Footer`, `UpdateNotice` |
+| `Teile.tsx` (`Knopf`, `Fueller`, Passwortfeld, `Seite`) | `Controls.tsx` (`Button`, `Spacer`, `PasswordField`, `Page`, `Loading`) |
+| `i18n`: `Sprache`, `SPRACHEN`, `spracheWaehlen`, `nurDeutsch` | `Language`, `LANGUAGES`, `chooseLanguage`, `syncLanguage`, `germanOnly` |
+| `offline/ruhe.ts`: `useBeschaeftigt`, `istRuhig` | `offline/idle.ts`: `useBusy`, `isIdle`, `setOutboxCheck` |
+| Health: `datenbank`, `zeit`, `gestoert` | `database`, `time`, `degraded` / `unavailable` |
+
+CSS-Klassen: `kopf` → `header`, `rahmen` → `layout` (als Knopfvariante `outline`), `inhalt` → `content`, `spalte` → `column`,
+`fueller` → `spacer`, `knopf` → `button`, `hinweis` → `notice`, `karte` → `card`, `feld` → `field`, `eingabe` → `input`,
+`klein` → `small`, `unter` → `subtitle`, `gross` → `large`, `fett` → `bold`, `mitte` → `center`, `sprach-wahl` →
+`language-picker`, `fusszeile` → `footer`, Farben `blau`/`gruen`/`rot`/`dunkel` → `blue`/`green`/`red`/`dark`.
+CSS-Variablen: `--blau*` → `--blue*`, `--gruen*` → `--green*`, `--rot` → `--red`, `--weiss` → `--white`, `--grau` → `--grey`,
+`--rand` → `--border`, `--grund` → `--background`, `--feld` → `--field-border`, `--kopf` → `--header-height`.

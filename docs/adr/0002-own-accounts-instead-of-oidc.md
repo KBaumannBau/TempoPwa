@@ -32,4 +32,4 @@ Handy angemeldet; PIN nur noch für Mitarbeiter ohne Handy. Das Schema enthält 
 - Kein externer Identitätsdienst nötig; Onboarding per Brief funktioniert für alle Gruppen.
 - Passwort-Zurücksetzen, Sperren und Geräteverwaltung liegen bei uns (PC: Administrator/Lohnbüro).
 - `api_platform.defaults.stateless` muss für die Sitzungs-Endpunkte bzw. die Firewall angepasst werden.
-- Offen: Ablage des Brief-Einmal-Passworts im Schema (Vorschlag in `docs/uebernahme.md`, Abschnitt 1).
+- Offen: Ablage des Brief-Einmal-Passworts im Schema (Vorschlag in `docs/porting-status.md`, Abschnitt 1).

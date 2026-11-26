@@ -1,19 +1,19 @@
 # ============================================================
-# Tempo: Build, Test und Deploy nach Mittwald (rsync über SSH)
+# Tempo: build, test and deploy to Mittwald (rsync over SSH)
 #   API (Symfony)  -> /home/p-yt27xz/html/tempo-api
 #   PWA (Vite)     -> /home/p-yt27xz/html/tempo-app
-# Deployt wird nur, wenn API und PWA beide fehlerfrei gebaut und getestet sind.
+# Deploys only when API and PWA are both built and tested without errors.
 #
-# Secrets im Repo (Settings → Secrets and variables → Actions), wie in TempoVibe:
+# Secrets in the repo (Settings → Secrets and variables → Actions), as in TempoVibe:
 #   TEMPO_SSH_PRIVATE_KEY, TEMPO_SSH_HOST, TEMPO_SSH_USER, TEMPO_SSH_PORT
-# Für die Datenbank der API (wird beim Deploy in tempo-api/.env.local ergänzt, falls dort noch nicht gesetzt):
+# For the database of the API (added to tempo-api/.env.local during the deploy if not set there yet):
 #   TEMPO_API_DATABASE_URL
-# Version: Datei VERSION im Wurzelordner (gepflegt von ./deployment.sh).
-#   Push auf main  -> Build-Version "X.Y.Z+<commit>" auf die Testinstanz
-#   Tag vX.Y.Z     -> Release "X.Y.Z": Tag muss zu VERSION passen, Deploy und GitHub-Release
+# Version: file VERSION in the root folder (maintained by ./deployment.sh).
+#   Push to main   -> build version "X.Y.Z+<commit>" on the test instance
+#   Tag vX.Y.Z     -> release "X.Y.Z": the tag must match VERSION, deploy and GitHub release
 # Optional:
-#   Variable TEMPO_API_URL – Adresse der API, wenn sie nicht unter derselben Domain wie die PWA
-#            unter /api läuft (z. B. https://api.example.de). Leer = gleicher Origin.
+#   Variable TEMPO_API_URL – address of the API if it does not run on the same domain as the PWA
+#            under /api (e.g. https://api.example.de). Empty = same origin.
 # ============================================================
 name: Deploy to Mittwald
 
@@ -23,7 +23,7 @@ on:
       - main
     tags:
       - 'v*'
-  # Manuell (Redeploy): Actions → "Deploy to Mittwald" → Run workflow
+  # Manually (redeploy): Actions → "Deploy to Mittwald" → Run workflow
   workflow_dispatch:
 
 concurrency:
@@ -33,14 +33,14 @@ concurrency:
 env:
   TARGET_API: /home/p-yt27xz/html/tempo-api/
   TARGET_APP: /home/p-yt27xz/html/tempo-app/
-  # Adressen der Testinstanz (CORS und DEFAULT_URI der API)
+  # Addresses of the test instance (CORS and DEFAULT_URI of the API)
   API_ORIGIN: https://tempo-api.p-yt27xz.project.space
   APP_ORIGIN: https://tempo-app.p-yt27xz.project.space
 
 jobs:
   # ---------------------------------------------------------------- Version
   version:
-    name: Version bestimmen
+    name: Determine version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.v.outputs.version }}
@@ -53,24 +53,24 @@ jobs:
           fetch-tags: true
 
       - id: v
-        name: Version aus VERSION
+        name: Version from VERSION
         run: |
           set -euo pipefail
-          basis="$(tr -d '[:space:]' < VERSION)"
-          if ! printf '%s' "$basis" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "::error::VERSION enthält keine gültige Version: '$basis'"; exit 1
+          base="$(tr -d '[:space:]' < VERSION)"
+          if ! printf '%s' "$base" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::VERSION enthält keine gültige Version: '$base'"; exit 1
           fi
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            if [ "$GITHUB_REF_NAME" != "v$basis" ]; then
-              echo "::error::Tag $GITHUB_REF_NAME passt nicht zu VERSION ($basis)."; exit 1
+            if [ "$GITHUB_REF_NAME" != "v$base" ]; then
+              echo "::error::Tag $GITHUB_REF_NAME passt nicht zu VERSION ($base)."; exit 1
             fi
-            version="$basis"; release=true; deploy=true
+            version="$base"; release=true; deploy=true
           else
-            version="$basis+${GITHUB_SHA::7}"; release=false; deploy=true
-            # Trägt der Commit schon ein Release-Tag, deployt der Tag-Lauf (sonst zwei Deploys um die Wette)
-            if git tag --points-at HEAD | grep -qx "v$basis"; then
+            version="$base+${GITHUB_SHA::7}"; release=false; deploy=true
+            # If the commit already carries a release tag, the tag run deploys (otherwise two deploys race)
+            if git tag --points-at HEAD | grep -qx "v$base"; then
               deploy=false
-              echo "::notice::Commit ist als v$basis getaggt – Deploy übernimmt der Lauf für das Tag."
+              echo "::notice::Commit ist als v$base getaggt – Deploy übernimmt der Lauf für das Tag."
             fi
           fi
           echo "Version: $version (Release: $release, Deploy: $deploy)"
@@ -82,7 +82,7 @@ jobs:
 
   # ---------------------------------------------------------------- API
   api:
-    name: API bauen und testen
+    name: Build and test API
     needs: version
     runs-on: ubuntu-latest
     services:
@@ -102,12 +102,12 @@ jobs:
         working-directory: api
     env:
       DATABASE_URL: postgresql://tempo:ci@127.0.0.1:5432/tempo?serverVersion=17&charset=utf8
-      APP_SECRET: ci-nur-fuer-tests
+      APP_SECRET: ci-only-for-tests
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: PHP 8.4 einrichten
+      - name: Set up PHP 8.4
         uses: shivammathur/setup-php@2.40.0
         with:
           php-version: '8.4'
@@ -115,19 +115,19 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      - name: Composer-Cache
+      - name: Composer cache
         uses: actions/cache@v6
         with:
           path: ~/.cache/composer
           key: composer-${{ hashFiles('api/composer.lock') }}
 
-      # Tests mit allen Abhängigkeiten
-      - name: composer install (mit dev)
+      # Tests with all dependencies
+      - name: composer install (with dev)
         run: composer install --no-interaction --no-progress --prefer-dist
         env:
           APP_ENV: test
 
-      - name: Testdatenbank anlegen und migrieren
+      - name: Create and migrate test database
         run: |
           php bin/console doctrine:database:create --env=test --if-not-exists
           php bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration
@@ -135,12 +135,12 @@ jobs:
       - name: PHPUnit
         run: vendor/bin/phpunit
 
-      - name: Container prüfen (prod)
+      - name: Lint container (prod)
         run: php bin/console lint:container --env=prod --no-debug
         env:
           APP_ENV: prod
 
-      # Auslieferung: ohne dev-Pakete, ohne Tests
+      # Delivery: without dev packages, without tests
       - name: composer install (prod)
         run: |
           rm -rf vendor var
@@ -148,17 +148,17 @@ jobs:
           APP_ENV=prod APP_DEBUG=0 php bin/console assets:install public --env=prod --no-debug
           rm -rf var
 
-      - name: Apache-Dateien, Deploy-Skript und Version einfügen
+      - name: Add Apache files, deploy script and version
         env:
           APP_VERSION: ${{ needs.version.outputs.version }}
         run: |
           printf '%s\n' "$APP_VERSION" > VERSION
           cp ../deploy/mittwald/api/.htaccess .htaccess
           cp ../deploy/mittwald/api/public/.htaccess public/.htaccess
-          cp ../deploy/mittwald/api/nach-dem-deploy.sh nach-dem-deploy.sh
+          cp ../deploy/mittwald/api/post-deploy.sh post-deploy.sh
           cp ../deploy/mittwald/api/.env.local.example .env.local.example
 
-      - name: Paket packen
+      - name: Pack package
         run: |
           tar -czf ../api-build.tgz \
             --exclude=./tests --exclude=./.phpunit.cache --exclude=./phpunit.dist.xml \
@@ -173,7 +173,7 @@ jobs:
 
   # ---------------------------------------------------------------- PWA
   app:
-    name: PWA bauen
+    name: Build PWA
     needs: version
     runs-on: ubuntu-latest
     defaults:
@@ -183,7 +183,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Node einrichten
+      - name: Set up Node
         uses: actions/setup-node@v7
         with:
           node-version: '22'
@@ -193,19 +193,19 @@ jobs:
       - name: npm ci
         run: npm ci
 
-      # Typecheck (tsc -b) + Vite-Build → dist/. Ein TypeScript-Fehler bricht hier ab.
+      # Typecheck (tsc -b) + Vite build → dist/. A TypeScript error stops here.
       - name: Build
         run: npm run build
         env:
           VITE_API_URL: ${{ vars.TEMPO_API_URL }}
           APP_VERSION: ${{ needs.version.outputs.version }}
 
-      # .htaccess aus der Vorlage (ohne Basic Auth: die Testinstanz ist offen, die App hat eine eigene Anmeldung).
-      # Eine alte .htpasswd auf dem Server entfernt der Deploy über rsync --delete.
+      # .htaccess from the template (no basic auth: the test instance is open, the app has its own sign-in).
+      # An old .htpasswd on the server is removed by the deploy via rsync --delete.
       - name: .htaccess
         run: |
           set -euo pipefail
-          cp ../deploy/mittwald/app/htaccess.vorlage dist/.htaccess
+          cp ../deploy/mittwald/app/htaccess.template dist/.htaccess
           cat dist/.htaccess
 
       - uses: actions/upload-artifact@v7
@@ -216,10 +216,10 @@ jobs:
           retention-days: 3
 
   # ---------------------------------------------------------------- Deploy
-  # Zwei getrennte Deploy-Jobs: Scheitert das Server-Skript der API, kommt die PWA trotzdem an
-  # (und umgekehrt). Beide starten nur, wenn API und PWA fehlerfrei gebaut sind.
+  # Two separate deploy jobs: if the server script of the API fails, the PWA still arrives
+  # (and vice versa). Both start only when API and PWA are built without errors.
   deploy-api:
-    name: Deploy API nach Mittwald
+    name: Deploy API to Mittwald
     needs: [version, api, app]
     if: needs.version.outputs.deploy == 'true'
     runs-on: ubuntu-latest
@@ -229,34 +229,34 @@ jobs:
           name: api-build
           path: .
 
-      - name: API entpacken
+      - name: Unpack API
         run: mkdir api && tar -xzf api-build.tgz -C api
 
-      # Werte für die .env.local auf dem Server. nach-dem-deploy.sh übernimmt daraus nur, was dort
-      # fehlt oder noch ein Platzhalter ist, und löscht die Datei danach. APP_SECRET entsteht auf dem Server.
-      # Die Datei entsteht erst hier im Deploy-Job und steckt nicht im Build-Artefakt.
-      - name: Erstanlage für .env.local
+      # Values for the .env.local on the server. post-deploy.sh takes over only what is missing there
+      # or still a placeholder, and deletes the file afterwards. APP_SECRET is generated on the server.
+      # The file is created only here in the deploy job and is not part of the build artifact.
+      - name: Initial values for .env.local
         env:
           DATABASE_URL: ${{ secrets.TEMPO_API_DATABASE_URL }}
         run: |
           set -euo pipefail
           umask 077
-          # Ohne Secret bleibt die DATABASE_URL auf dem Server, wie sie ist. Fehlt sie dort ganz,
-          # meldet das nach-dem-deploy.sh im nächsten Schritt.
+          # Without the secret the DATABASE_URL on the server stays as it is. If it is missing there entirely,
+          # post-deploy.sh reports it in the next step.
           {
             echo "APP_ENV=prod"
             echo "APP_DEBUG=0"
             if [ -n "$DATABASE_URL" ]; then printf 'DATABASE_URL="%s"\n' "$DATABASE_URL"; fi
             printf "CORS_ALLOW_ORIGIN='%s'\n" "^${APP_ORIGIN//./\\.}\$"
             echo "DEFAULT_URI=${API_ORIGIN}"
-          } > api/.env.local.erstanlage
-          sed -e 's/^DATABASE_URL=.*/DATABASE_URL="***"/' api/.env.local.erstanlage
+          } > api/.env.local.initial
+          sed -e 's/^DATABASE_URL=.*/DATABASE_URL="***"/' api/.env.local.initial
 
-      # API: --delete entfernt, was nicht mehr im Build ist. Geschützt (EXCLUDE) bleiben
-      # .env.local (Geheimnisse, nur auf dem Server), var/ (Cache, Logs) und ACME-Challenges.
-      # Mit synchronisiert: .env.local.example (Beispiel) und .env.local.erstanlage (wird vom Skript verbraucht).
-      # Danach auf dem Server: .env.local anlegen/ergänzen, Cache aufbauen, Migrationen.
-      - name: API deployen (tempo-api)
+      # API: --delete removes what is no longer in the build. Protected (EXCLUDE) are
+      # .env.local (secrets, only on the server), var/ (cache, logs) and ACME challenges.
+      # Synced as well: .env.local.example (example) and .env.local.initial (consumed by the script).
+      # Then on the server: create/complete .env.local, warm up the cache, migrations.
+      - name: Deploy API (tempo-api)
         uses: easingthemes/ssh-deploy@v6.0.1
         with:
           SSH_PRIVATE_KEY: ${{ secrets.TEMPO_SSH_PRIVATE_KEY }}
@@ -268,11 +268,11 @@ jobs:
           ARGS: "-rlptgoDzv --delete"
           SSH_CMD_ARGS: "-o StrictHostKeyChecking=no,-o IdentitiesOnly=yes"
           EXCLUDE: "/.env.local, /var/, /.well-known/"
-          SCRIPT_AFTER: sh ${{ env.TARGET_API }}nach-dem-deploy.sh ${{ env.TARGET_API }}
+          SCRIPT_AFTER: sh ${{ env.TARGET_API }}post-deploy.sh ${{ env.TARGET_API }}
           SCRIPT_AFTER_REQUIRED: "true"
 
   deploy-app:
-    name: Deploy PWA nach Mittwald
+    name: Deploy PWA to Mittwald
     needs: [version, api, app]
     if: needs.version.outputs.deploy == 'true'
     runs-on: ubuntu-latest
@@ -282,8 +282,8 @@ jobs:
           name: app-build
           path: app/
 
-      # PWA: nur der Inhalt von dist/. --delete entfernt alte Hash-Assets.
-      - name: PWA deployen (tempo-app)
+      # PWA: only the content of dist/. --delete removes old hashed assets.
+      - name: Deploy PWA (tempo-app)
         uses: easingthemes/ssh-deploy@v6.0.1
         with:
           SSH_PRIVATE_KEY: ${{ secrets.TEMPO_SSH_PRIVATE_KEY }}
@@ -297,17 +297,17 @@ jobs:
           EXCLUDE: "/.well-known/"
 
   # ---------------------------------------------------------------- Release
-  # Nur für Tags vX.Y.Z: GitHub-Release mit automatisch erzeugten Notizen, nachdem beides deployt ist.
-  # Ein Prod-System gibt es noch nicht (Betrieb offen, CLAUDE.md); ein Prod-Deploy kommt hier dazu.
+  # Only for tags vX.Y.Z: GitHub release with generated notes after both are deployed.
+  # There is no prod system yet (operations open, CLAUDE.md); a prod deploy is added here.
   release:
-    name: GitHub-Release anlegen
+    name: Create GitHub release
     needs: [version, deploy-api, deploy-app]
     if: needs.version.outputs.release == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Release anlegen
+      - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

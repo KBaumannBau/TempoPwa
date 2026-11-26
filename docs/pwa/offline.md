@@ -142,9 +142,9 @@ Ein Mensch kann jeden dieser Fälle im normalen Ablauf lösen, ohne dass Daten v
   selbst räumt. Auf dem iPhone räumt Safari Website-Daten nach sieben Tagen ohne Nutzung. Für eine **zum
   Home-Bildschirm hinzugefügte** App gilt das nicht. Darum ist die Installation für Mitarbeiter Pflicht.
 - Die Daten sind klein (Stempelungen weniger Tage). Mengen sind kein Problem, nur die Haltbarkeit.
-- **App-Update** (umgesetzt in `pwa/src/components/Aktualisierung.tsx`):
+- **App-Update** (umgesetzt in `pwa/src/components/UpdateNotice.tsx`):
   - *Ausliefern:* Jeder Deploy erzeugt eine neue `sw.js` mit der Liste aller Dateien und ihren Prüfsummen.
-    `sw.js`, `index.html` und Manifest werden nie gecacht (`deploy/mittwald/app/htaccess.vorlage`). Geladen
+    `sw.js`, `index.html` und Manifest werden nie gecacht (`deploy/mittwald/app/htaccess.template`). Geladen
     werden nur geänderte Dateien.
   - *Nachfragen:* beim Start, bei jedem Wechsel in den Vordergrund (`visibilitychange`), wenn wieder Netz da
     ist, und alle 30 Minuten, solange die App offen ist. Das ist wichtig fürs iPhone: Dort wird eine
@@ -152,7 +152,7 @@ Ein Mensch kann jeden dieser Fälle im normalen Ablauf lösen, ohne dass Daten v
   - *Übernehmen:* `registerType: 'prompt'`. Die neue Version wartet im Hintergrund und wird **nicht mitten in
     der Arbeit** aktiviert, sondern
     1. still, sobald die App in den Hintergrund geht **und ruhig ist**, also kein Bildschirm etwas in Arbeit hat
-       (`useBeschaeftigt`) und der Ausgang leer ist (`ausgangPruefenMit`, kommt mit dem Sync-Modul).
+       (`useBusy`) und der Ausgang leer ist (`setOutboxCheck`, kommt mit dem Sync-Modul).
        Beim Zurückholen ist sie schon aktiv. Der Mitarbeiter merkt nichts.
     2. oder, wenn der Mitarbeiter auf den Hinweis „Neue Version der App verfügbar“ tippt (mit Rückfrage, falls
        noch etwas in Arbeit ist),

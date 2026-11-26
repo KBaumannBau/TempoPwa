@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** Adresse der API, wenn sie nicht auf demselben Origin liegt (z. B. https://api.example.de). Leer = gleicher Origin. */
+  /** Address of the API if it is not on the same origin (e.g. https://api.example.de). Empty = same origin. */
   readonly VITE_API_URL?: string;
 }
 
@@ -9,5 +9,5 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-/** Version der App (aus VERSION bzw. der Pipeline), eingesetzt von Vite beim Bauen */
+/** Version of the app (from VERSION or the pipeline), inserted by Vite at build time */
 declare const __APP_VERSION__: string;

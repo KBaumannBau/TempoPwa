@@ -15,17 +15,17 @@ Workflow `.github/workflows/deploy.yml` mit drei Jobs:
 
 1. **api:** PHP 8.4, `composer install`, PHPUnit gegen PostgreSQL 17 (Service-Container), `lint:container` für prod;
    danach `composer install --no-dev`, `assets:install`, Apache-Dateien aus `deploy/mittwald/api/` einfügen, packen.
-2. **app:** Node 22, `npm ci`, `npm run build` (Typecheck + Vite), `.htaccess` aus `deploy/mittwald/app/htaccess.vorlage`.
+2. **app:** Node 22, `npm ci`, `npm run build` (Typecheck + Vite), `.htaccess` aus `deploy/mittwald/app/htaccess.template`.
    Keine Basic Auth (entfernt am 21.11.2026: Handys luden Manifest und Icons ohne Zugangsdaten und zeigten kein Logo;
    die App hat ihre eigene Anmeldung).
 3. **deploy** (nur wenn beide grün): rsync über SSH (`easingthemes/ssh-deploy`, Secrets `TEMPO_SSH_*` wie in TempoVibe)
-   - API → `/home/p-yt27xz/html/tempo-api/`, danach auf dem Server `nach-dem-deploy.sh`
+   - API → `/home/p-yt27xz/html/tempo-api/`, danach auf dem Server `post-deploy.sh`
      (`.env.local` beim ersten Mal anlegen, Cache aufbauen, Migrationen, falls die Datenbank erreichbar ist)
    - PWA → `/home/p-yt27xz/html/tempo-app/`
 
 Geheimnisse der API (`APP_SECRET`, `DATABASE_URL`, `CORS_ALLOW_ORIGIN`) liegen nur in `tempo-api/.env.local`
-auf dem Server; rsync löscht sie nie. Der Deploy-Job schreibt eine `.env.local.erstanlage` (DATABASE_URL aus dem
-Secret `TEMPO_API_DATABASE_URL`, CORS und `DEFAULT_URI` aus dem Workflow); `nach-dem-deploy.sh` übernimmt daraus nur
+auf dem Server; rsync löscht sie nie. Der Deploy-Job schreibt eine `.env.local.initial` (DATABASE_URL aus dem
+Secret `TEMPO_API_DATABASE_URL`, CORS und `DEFAULT_URI` aus dem Workflow); `post-deploy.sh` übernimmt daraus nur
 fehlende Schlüssel oder Platzhalter (`change-me`), erzeugt `APP_SECRET` auf dem Server und löscht die Datei wieder.
 Von Hand gepflegte Werte bleiben unangetastet. `.env.local.example` wird bei jedem Deploy mit synchronisiert. `tempo-api/.htaccess` leitet alles nach `public/`, damit Code und `.env.local`
 auch dann nicht erreichbar sind, wenn die Domain auf `tempo-api` statt auf `tempo-api/public` zeigt.

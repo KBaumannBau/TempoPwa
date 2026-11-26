@@ -1,6 +1,6 @@
 // First sign-in with the letter: one-time password → own password → done.
 // Model: TempoVibe src/screens/Zugang.tsx · Registrierung (steps 1, 2 and 6).
-// Still open from the demo: privacy notice (legal text from the database), ID check, location (docs/uebernahme.md).
+// Still open from the demo: privacy notice (legal text from the database), ID check, location (docs/porting-status.md).
 // Online only: the one-time password is checked by the server alone.
 
 import { useState, type FormEvent } from 'react';
@@ -8,7 +8,7 @@ import { Link, Navigate, useNavigate } from 'react-router';
 import { Button, Loading, Page, PasswordField, Spacer } from '../components/Controls';
 import { tx } from '../i18n';
 import { useOnline } from '../offline/online';
-import { useBeschaeftigt } from '../offline/ruhe';
+import { useBusy } from '../offline/idle';
 import { passwordViolation } from '../auth/passwordPolicy';
 import { useSession } from '../auth/session';
 
@@ -31,7 +31,7 @@ function OneTimePassword() {
   const [message, setMessage] = useState('');
   const [blocked, setBlocked] = useState(false);
   const [busy, setBusy] = useState(false);
-  useBeschaeftigt(busy);
+  useBusy(busy);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -49,21 +49,21 @@ function OneTimePassword() {
 
   return (
     <Page title={tx('Erste Anmeldung')}>
-      <form className="spalte" onSubmit={(e) => void submit(e)} noValidate>
+      <form className="column" onSubmit={(e) => void submit(e)} noValidate>
         <Link to="/" className="link">{tx('‹ Zur Anmeldung')}</Link>
         <h1 className="h1">{tx('Erste Anmeldung')}</h1>
         <p className="text">{tx('Trage den Benutzernamen und das Einmal-Passwort aus deinem Brief ein.')}</p>
-        {!online && <div className="hinweis orange" role="status">{tx('Für die erste Anmeldung braucht das Handy Internet.')}</div>}
-        <div className="feld">
+        {!online && <div className="notice orange" role="status">{tx('Für die erste Anmeldung braucht das Handy Internet.')}</div>}
+        <div className="field">
           <label htmlFor="registration-username">{tx('Benutzername')}</label>
-          <input id="registration-username" className="eingabe" autoComplete="username" autoCapitalize="characters" autoCorrect="off" spellCheck={false}
+          <input id="registration-username" className="input" autoComplete="username" autoCapitalize="characters" autoCorrect="off" spellCheck={false}
             value={username} onChange={(e) => { setUsername(e.target.value); setMessage(''); setBlocked(false); }} />
         </div>
         <PasswordField label={tx('Einmal-Passwort aus dem Brief')} value={oneTimePassword} onChange={(v) => { setOneTimePassword(v); setMessage(''); }} autoComplete="one-time-code" />
-        {message && <div className="hinweis orange" role="alert">{message}</div>}
+        {message && <div className="notice orange" role="alert">{message}</div>}
         <Spacer />
         <Button type="submit" disabled={!online || !username.trim() || !oneTimePassword || blocked || busy}>{busy ? tx('Einen Moment …') : tx('Anmelden')}</Button>
-        <span className="klein">{tx('Brief verloren oder abgelaufen? Die Lohnbuchhaltung schickt dir einen neuen. Der alte gilt dann nicht mehr.')}</span>
+        <span className="small">{tx('Brief verloren oder abgelaufen? Die Lohnbuchhaltung schickt dir einen neuen. Der alte gilt dann nicht mehr.')}</span>
       </form>
     </Page>
   );
@@ -75,7 +75,7 @@ function OwnPassword({ onDone }: { onDone: () => void }) {
   const [second, setSecond] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  useBeschaeftigt(true); // no app update in the middle of the registration
+  useBusy(true); // no app update in the middle of the registration
 
   const forbidden = session.state === 'password_change_required' ? [session.oneTimePassword, session.account.username] : [];
   const submit = async (event: FormEvent) => {
@@ -95,13 +95,13 @@ function OwnPassword({ onDone }: { onDone: () => void }) {
 
   return (
     <Page title={tx('Eigenes Passwort')}>
-      <form className="spalte" onSubmit={(e) => void submit(e)} noValidate>
+      <form className="column" onSubmit={(e) => void submit(e)} noValidate>
         <h1 className="h1">{tx('Lege jetzt dein eigenes Passwort fest')}</h1>
         <p className="text">{tx('Das Einmal-Passwort aus dem Brief gilt ab jetzt nicht mehr. Ohne eigenes Passwort geht es nicht weiter.')}</p>
         <PasswordField label={tx('Neues Passwort')} value={first} onChange={(v) => { setFirst(v); setError(''); }} autoComplete="new-password" />
         <PasswordField label={tx('Neues Passwort wiederholen')} value={second} onChange={(v) => { setSecond(v); setError(''); }} autoComplete="new-password" />
-        <span className="klein">{tx('Mindestens 8 Zeichen, mit mindestens einem Buchstaben und einer Ziffer. Gib das Passwort niemandem weiter, auch nicht dem Polier.')}</span>
-        {error && <div className="hinweis orange" role="alert">{error}</div>}
+        <span className="small">{tx('Mindestens 8 Zeichen, mit mindestens einem Buchstaben und einer Ziffer. Gib das Passwort niemandem weiter, auch nicht dem Polier.')}</span>
+        {error && <div className="notice orange" role="alert">{error}</div>}
         <Spacer />
         <Button type="submit" disabled={!first || !second || busy}>{busy ? tx('Einen Moment …') : tx('Passwort speichern')}</Button>
       </form>
@@ -113,11 +113,11 @@ function Done({ firstName }: { firstName: string }) {
   const navigate = useNavigate();
   return (
     <Page title={tx('Fertig')}>
-      <h1 className="h1 gross">{tx('Fertig, {0}!', firstName)}</h1>
+      <h1 className="h1 large">{tx('Fertig, {0}!', firstName)}</h1>
       <p className="text">{tx('Du bist angemeldet. Dieses Handy bleibt angemeldet, du musst dich beim Öffnen der App nicht neu anmelden.')}</p>
       <p className="text">{tx('Dein Passwort brauchst du nur auf einem neuen Handy oder wenn du dich abgemeldet hast.')}</p>
       <Spacer />
-      <Button color="gruen" onClick={() => navigate('/home', { replace: true })}>{tx('Gleich loslegen')}</Button>
+      <Button color="green" onClick={() => navigate('/home', { replace: true })}>{tx('Gleich loslegen')}</Button>
     </Page>
   );
 }

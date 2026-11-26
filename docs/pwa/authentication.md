@@ -17,7 +17,7 @@ Tabellen heißen im Code englisch (Schema `tempo`, Zuordnung in `docs/database/n
 |---|---|---|
 | `se.person` | Benutzername = `pers_nr`, `nutzt_app`, `gesperrt_am` | NU-Personen haben keine `pers_nr`, brauchen eine eigene Kennung (offen) |
 | `se.zugang` | `status`, `passwort_hash`, `pin_hash`, `fehlversuche`, `gesperrt_bis`, `sprache`, `registriert_am` | Kommentar „`passwort_hash` nur PC-Rollen“ ist überholt: Seit dem Brief-Verfahren hat **jeder** App-Nutzer ein eigenes Passwort. Umgesetzt in `tempo.account.password_hash`. |
-| `se.einladung` | Brief mit Einmal-Passwort: `token_hash`, `gueltig_bis` (14 Tage), `genutzt_am`, `gedruckt = true` | wie in `uebernahme.md` vorgeschlagen; ein neuer Brief setzt die alten auf ungültig |
+| `se.einladung` | Brief mit Einmal-Passwort: `token_hash`, `gueltig_bis` (14 Tage), `genutzt_am`, `gedruckt = true` | wie in `porting-status.md` vorgeschlagen; ein neuer Brief setzt die alten auf ungültig |
 | `se.anmeldecode` | 6-stelliger Code, 15 Minuten | für die Anmeldung per Code, hier nicht gebraucht |
 | `se.geraet` | Geräte-Token: `schluessel_hash`, `status`, `zuletzt_gesehen`, `abgemeldet_am` | **ein** aktives Gerät je Person (`geraet_ein_aktives_je_person`) |
 | `se.zweiter_faktor` | TOTP/Passkey für den PC | nicht fürs Handy |
@@ -153,7 +153,7 @@ docker compose exec php bin/console tempo:access:issue-letter 1001
 
 - `tx('Deutscher Text', …werte)` in `pwa/src/i18n/index.ts`; der deutsche Text ist der Schlüssel, Platzhalter `{0}`.
 - Je Sprache eine flache JSON-Datei (`en, fr, hr, it, pl, ro`). Fehlt ein Eintrag, erscheint Deutsch.
-- Sprachwechsel lädt die Seite neu. Polier, Bauleitung und PC bleiben deutsch (`nurDeutsch()`).
+- Sprachwechsel lädt die Seite neu. Polier, Bauleitung und PC bleiben deutsch (`germanOnly()`).
 - Datum und Uhrzeit über `Intl` bzw. `toLocale…String(sprache)`.
 
 Warum kein i18next/FormatJS und kein XLIFF: Die Texte sind kurz, Mehrzahlformen kaum nötig, und der deutsche
@@ -166,7 +166,7 @@ Sprache und Anmeldung:
 
 - Die Sprachwahl in der Kopfleiste geht **vor** der Anmeldung (wichtig für Mitarbeiter, die kein Deutsch lesen).
 - Bei der ersten Anmeldung schickt die App die gewählte Sprache mit, der Server speichert sie in `tempo.account.language`.
-- Danach gilt die Sprache vom Server (`spracheAbgleichen`, wird beim Umbau englisch). Eine Änderung in der Kopfleiste nach der Anmeldung
+- Danach gilt die Sprache vom Server (`syncLanguage` in `pwa/src/i18n/index.ts`). Eine Änderung in der Kopfleiste nach der Anmeldung
   muss noch an den Server gehen (Operation „Sprache setzen“, kommt mit „Mehr“).
 
 ## 7. Umsetzung

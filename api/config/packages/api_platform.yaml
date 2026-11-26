@@ -1,9 +1,9 @@
 api_platform:
     title: Tempo API
     description: 'Stundenerfassung K. Baumann Bau – REST-API für die PWA'
-    # Version aus der Datei VERSION (siehe Kernel), erscheint als Badge im Kopf von /api/docs
+    # Version from the file VERSION (see Kernel), shown as a badge in the header of /api/docs
     version: '%app.version%'
-    # Ressourcen sind eigene DTOs je Kontext (src/<Kontext>/Api/Resource), keine Doctrine-Entities.
+    # Resources are dedicated DTOs per context (src/<Context>/Api/Resource), no Doctrine entities.
     # Only the resource folders: src/ also holds Doctrine XML mappings, which API Platform must not read.
     # New context = add its Api/Resource folder here.
     mapping:

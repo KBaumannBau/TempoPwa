@@ -207,19 +207,19 @@ export interface components {
             readonly description?: string | null;
         };
         /**
-         * @description Smoke-Test: Läuft die API, erreicht sie die Datenbank?
-         *     Ohne Anmeldung erreichbar, liefert keine Fachdaten.
+         * @description Smoke test: is the API running, can it reach the database?
+         *     Reachable without sign-in, returns no business data.
          */
         Health: {
-            /** @description ok, wenn alle Prüfungen bestanden sind, sonst gestoert */
+            /** @description ok, wenn alle Prüfungen bestanden sind, sonst degraded */
             status: string;
-            /** @description ok oder gestoert */
-            datenbank: string;
+            /** @description ok oder unavailable */
+            database: string;
             /**
              * Format: date-time
              * @description Serverzeit (UTC)
              */
-            zeit: string;
+            time: string;
             /** @description Version der API, z. B. 0.2.0 oder 0.2.0+abc1234 (Build aus main) */
             version: string;
         };

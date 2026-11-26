@@ -6,7 +6,7 @@
 // - "Sign out this phone" revokes the device at the server and deletes everything. Online only.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { spracheAbgleichen, sprache, tx } from '../i18n';
+import { language, syncLanguage, tx } from '../i18n';
 import { useOnline } from '../offline/online';
 import type { Account } from './account';
 import { authApi, type Rejection } from './api';
@@ -41,8 +41,8 @@ interface SessionApi {
 
 const SessionContext = createContext<SessionApi | null>(null);
 
-const clockTime = (d: Date) => d.toLocaleTimeString(sprache, { hour: '2-digit', minute: '2-digit' });
-const calendarDate = (d: Date) => d.toLocaleDateString(sprache, { day: '2-digit', month: '2-digit', year: 'numeric' });
+const clockTime = (d: Date) => d.toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' });
+const calendarDate = (d: Date) => d.toLocaleDateString(language, { day: '2-digit', month: '2-digit', year: 'numeric' });
 
 /** Business rejection of the server as text for the user (German key, translated with tx) */
 export function rejectionText(rejection: Rejection): { text: string; blocked?: boolean } {
@@ -65,7 +65,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const enter = useCallback(async (account: Account, offlineOnly: boolean) => {
     await write(ACCOUNT_KEY, account);
     setSession({ state: 'signed_in', account, offlineOnly });
-    spracheAbgleichen(account.language);
+    syncLanguage(account.language);
   }, []);
 
   /** Delete everything on the phone: account, vault (later also read model and outbox) */
@@ -106,7 +106,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [signedIn, online, confirmWithServer]);
 
   const signIn = useCallback(async (username: string, password: string): Promise<SignInResult> => {
-    const result = await authApi.login(username, password, sprache);
+    const result = await authApi.login(username, password, language);
     if (result.kind === 'ok') {
       if (result.data.passwordChangeRequired) {
         setSession({ state: 'password_change_required', account: result.data.account, oneTimePassword: password });
@@ -137,7 +137,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (result.rejection.code === 'registration_expired') setSession({ state: 'signed_out' });
       return rejectionText(result.rejection).text;
     }
-    const account = { ...session.account, language: sprache };
+    const account = { ...session.account, language };
     await createVault(account, newPassword, result.serverTime);
     await enter(account, false);
     return null;

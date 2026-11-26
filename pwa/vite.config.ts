@@ -3,19 +3,19 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Version der App: in der Pipeline als APP_VERSION gesetzt (mit Build-Kennung),
-// sonst aus der Datei VERSION im Wurzelordner des Repos (gepflegt von deployment.sh).
+// Version of the app: set as APP_VERSION in the pipeline (with build id),
+// otherwise from the file VERSION in the root folder of the repo (maintained by deployment.sh).
 function appVersion(): string {
   if (process.env.APP_VERSION) return process.env.APP_VERSION;
   try {
-    return `${readFileSync(new URL('../VERSION', import.meta.url), 'utf8').trim()}+lokal`;
+    return `${readFileSync(new URL('../VERSION', import.meta.url), 'utf8').trim()}+local`;
   } catch {
-    return 'unbekannt';
+    return 'unknown';
   }
 }
 
-// Läuft im pwa-Container hinter nginx (ein Origin, siehe docker/nginx/conf).
-// Der Browser spricht nur mit nginx; der HMR-Websocket geht deshalb über HTTP_PORT.
+// Runs in the pwa container behind nginx (one origin, see docker/nginx/conf).
+// The browser only talks to nginx; the HMR websocket therefore goes through HTTP_PORT.
 const httpPort = Number(process.env.HTTP_PORT ?? 8011);
 
 export default defineConfig({
@@ -25,8 +25,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      // Updates kontrolliert übernehmen, nicht mitten in der Arbeit (components/Aktualisierung.tsx,
-      // docs/pwa/offline.md Abschnitt 7). Registriert wird der Service Worker in Aktualisierung.tsx.
+      // Take over updates in a controlled way, not in the middle of work (components/UpdateNotice.tsx,
+      // docs/pwa/offline.md section 7). The service worker is registered in UpdateNotice.tsx.
       registerType: 'prompt',
       injectRegister: false,
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
@@ -41,7 +41,7 @@ export default defineConfig({
         display: 'standalone',
         background_color: '#0077c8',
         theme_color: '#0077c8',
-        // Icons erzeugt mit scripts/icons.mjs (weißes „K.“ aus dem Logo auf Baumann-Blau)
+        // Icons generated with scripts/icons.mjs (white "K." from the logo on Baumann blue)
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
@@ -50,19 +50,19 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Die API wird nie vom Service Worker als App-Shell beantwortet
+        // The API is never answered by the service worker with the app shell
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api(\/|$)/, /^\/bundles\//, /^\/_profiler/, /^\/_wdt/],
-        // App-Hülle komplett auf dem Handy (Precache), damit die App ohne Netz startet.
-        // Fachdaten liegen nicht hier, sondern später in IndexedDB (docs/pwa/offline.md).
+        // The whole app shell on the phone (precache), so the app starts without network.
+        // Business data does not live here but later in IndexedDB (docs/pwa/offline.md).
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,json}'],
         cleanupOutdatedCaches: true,
-        // Schon beim ersten Besuch die offene Seite übernehmen: Die App läuft dann sofort offline, und
-        // spätere Updates melden sich zuverlässig („controlling“), damit die Seite einmal neu lädt.
-        // Kein skipWaiting: Eine neue Version wartet, bis Aktualisierung.tsx sie freigibt.
+        // Take control of the open page on the very first visit: the app then works offline at once, and
+        // later updates report reliably ("controlling"), so the page reloads once.
+        // No skipWaiting: a new version waits until UpdateNotice.tsx releases it.
         clientsClaim: true,
       },
-      // Im Devserver kein Service Worker, sonst stört er HMR
+      // No service worker in the dev server, it would disturb HMR
       devOptions: { enabled: false },
     }),
   ],

@@ -1,5 +1,5 @@
-# Umgebungsvariablen / Geheimnisse (nur die Datei im Wurzelordner;
-# api/.env, api/.env.dev und api/.env.test von Symfony bleiben versioniert)
+# Environment variables / secrets (only the file in the root folder;
+# api/.env, api/.env.dev and api/.env.test of Symfony stay versioned)
 /.env
 !/.env.example
 /api/.env.local
@@ -26,21 +26,21 @@
 /pwa/dev-dist/
 *.tsbuildinfo
 
-# IDE (Projekteinstellungen regelt .idea/.gitignore)
+# IDE (project settings are handled by .idea/.gitignore)
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 *.swp
 
-# Betriebssystem
+# Operating system
 .DS_Store
 Thumbs.db
 
-# Exporte
+# Exports
 ZEITERF*.DAT
 /_tmp/
 
-# Server-Umgebung für Mittwald (enthält Geheimnisse)
+# Server environment for Mittwald (contains secrets)
 /mittwald.env
-# Von der Pipeline ins API-Paket geschrieben (Quelle ist VERSION im Wurzelordner)
+# Written into the API package by the pipeline (source is VERSION in the root folder)
 /api/VERSION

@@ -11,8 +11,8 @@ use ApiPlatform\OpenApi\Model\Operation;
 use App\System\Api\State\HealthProvider;
 
 /**
- * Smoke-Test: Läuft die API, erreicht sie die Datenbank?
- * Ohne Anmeldung erreichbar, liefert keine Fachdaten.
+ * Smoke test: is the API running, can it reach the database?
+ * Reachable without sign-in, returns no business data.
  */
 #[ApiResource(
     shortName: 'Health',
@@ -30,13 +30,17 @@ use App\System\Api\State\HealthProvider;
 )]
 final readonly class Health
 {
+    public const string OK = 'ok';
+    public const string DEGRADED = 'degraded';
+    public const string UNAVAILABLE = 'unavailable';
+
     public function __construct(
-        #[ApiProperty(required: true, description: 'ok, wenn alle Prüfungen bestanden sind, sonst gestoert')]
+        #[ApiProperty(required: true, description: 'ok, wenn alle Prüfungen bestanden sind, sonst degraded')]
         public string $status,
-        #[ApiProperty(required: true, description: 'ok oder gestoert')]
-        public string $datenbank,
+        #[ApiProperty(required: true, description: 'ok oder unavailable')]
+        public string $database,
         #[ApiProperty(required: true, description: 'Serverzeit (UTC)')]
-        public \DateTimeImmutable $zeit,
+        public \DateTimeImmutable $time,
         #[ApiProperty(required: true, description: 'Version der API, z. B. 0.2.0 oder 0.2.0+abc1234 (Build aus main)')]
         public string $version,
     ) {

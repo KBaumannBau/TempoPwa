@@ -36,10 +36,10 @@ die Nummer (`0.1.0`).
 ```
 Tempo/
 ├── api/                 Symfony + API Platform (PHP 8.4), Fachlogik je Kontext unter src/<Kontext>/
-├── pwa/                 Vite + React 19 + TypeScript, Bildschirme unter src/screens/{ma,polier,bau,pc,nu}
+├── pwa/                 Vite + React 19 + TypeScript, Bildschirme unter src/screens/{worker,site-foreman,site-manager,office,subcontractor}
 ├── docker/              php (PHP-FPM), nginx, postgres – lokale Umgebung
 ├── deploy/mittwald/     Apache-Dateien und Server-Skript für die Testinstanz
-├── docs/                Architekturentscheidungen (adr/), Offline-Konzept (pwa/), Übernahme-Stand (uebernahme.md)
+├── docs/                Architekturentscheidungen (adr/), Offline-Konzept (pwa/), Übernahme-Stand (porting-status.md)
 ├── .github/workflows/   Build, Test und Deploy nach Mittwald
 ├── compose.yaml         lokale Dienste: nginx, php, database, pwa
 ├── deployment.sh        Deploy und Release über Git
@@ -68,6 +68,33 @@ Danach:
 
 Der `pwa`-Container installiert die npm-Pakete beim Start selbst und startet den Vite-Devserver.
 
+### Datenbank einrichten und ersten Zugang anlegen
+
+Nach dem ersten Start einmal die Migrationen ausführen und eine Person mit Zugang anlegen. Das Beispiel nutzt
+eine erfundene Person aus `seed.ts`:
+
+```bash
+docker compose exec php bin/console doctrine:migrations:migrate -n                       # Schema anlegen
+docker compose exec php bin/console tempo:access:create-person 1001 Stefan Maurer       # Person + eingeladenes Konto
+docker compose exec php bin/console tempo:access:issue-letter 1001                      # Anmeldebrief mit Einmalpasswort
+```
+
+- `create-person <Personalnummer> <Vorname> <Nachname>` legt Person und Konto an. Die Personalnummer ist zugleich
+  der Benutzername. Optionen: `--role` (Standard `skilled_worker`, z. B. `site_foreman`, `site_manager`),
+  `--employment` (`wage_earner`, `salaried`, `apprentice`) und `--language` (`de`, `pl`, `ro`, `hr`, `en`, `fr`, `it`).
+- `issue-letter <Personalnummer>` gibt den Anmeldebrief mit dem Einmalpasswort aus. Damit meldet sich die Person
+  unter http://localhost:8011 zum ersten Mal an. Details: [docs/pwa/authentication.md](docs/pwa/authentication.md).
+
+Für die Tests und die PWA danach:
+
+```bash
+docker compose exec php bin/console doctrine:migrations:migrate -n --env=test            # Schema der Testdatenbank
+docker compose exec php vendor/bin/phpunit                                              # Tests
+docker compose exec pwa npm run api:types                                               # API-Typen für die PWA erzeugen
+```
+
+Die Testdatenbank muss einmalig vorher mit `bin/console doctrine:database:create --env=test` angelegt werden.
+
 ## Wichtige Befehle
 
 | Zweck | Befehl |
@@ -77,7 +104,7 @@ Der `pwa`-Container installiert die npm-Pakete beim Start selbst und startet den
 | Tests (PHPUnit) | `docker compose exec php vendor/bin/phpunit` (einmalig vorher `bin/console doctrine:database:create --env=test`) |
 | PWA bauen (Typecheck + Build) | `docker compose exec pwa npm run build` |
 | API-Typen für die PWA erzeugen | `docker compose exec pwa npm run api:types` |
-| Prod-Build lokal ansehen | `PWA_MODUS=prod docker compose up -d nginx` (vorher `npm run build`) |
+| Prod-Build lokal ansehen | `PWA_MODE=prod docker compose up -d nginx` (vorher `npm run build`) |
 | Logs | `docker compose logs -f nginx php pwa` |
 
 Im PHP-Container gibt es Kurzbefehle: `docker compose exec php bash` öffnet eine Shell im Ordner `api/`, `help` zeigt
@@ -157,7 +184,7 @@ Ausgelöst wird der Deploy mit [`deployment.sh`](deployment.sh):
 ./deployment.sh -m "Nachricht"          # offene Änderungen vorher committen, dann pushen
 ./deployment.sh release                 # Release: Patch-Version erhöhen, Commit, Tag vX.Y.Z, Push
 ./deployment.sh release minor           # … oder minor / major / eine feste Version wie 1.0.0
-./deployment.sh --help                  # alle Optionen (--ohne-tests, --ja)
+./deployment.sh --help                  # alle Optionen (--skip-tests, --yes)
 ```
 
 | Auslöser | Version | Ergebnis |
@@ -188,7 +215,8 @@ und wird bei jedem Deploy mit kopiert. Details: [ADR 0003](docs/adr/0003-deploym
 - **Lokal und CI:** PostgreSQL 17 im Container.
 - **Testinstanz:** Supabase-Projekt `tempo-test` (Frankfurt, PostgreSQL 17), Zugriff über den Session-Pooler mit
   TLS. **Nur Testdaten.** Im Free-Plan pausiert Supabase das Projekt nach etwa einer Woche ohne Aktivität. Dann
-  meldet `/api/health` bei der Datenbank „gestoert“, und das Projekt muss im Supabase-Dashboard wieder gestartet werden.
+  meldet `/api/health` den Status `degraded` und bei `database` den Wert `unavailable`. Dann muss das Projekt im
+  Supabase-Dashboard wieder gestartet werden.
 - Zielschema: `TempoVibe/docs/datenbankschema.sql` (Schemas `se` und `protokoll`, Row Level Security). Es wird
   Kette für Kette als Doctrine-Migration übernommen.
 
@@ -197,7 +225,7 @@ und wird bei jedem Deploy mit kopiert. Details: [ADR 0003](docs/adr/0003-deploym
 - **[CLAUDE.md](CLAUDE.md)** ist verbindlich: Architektur (DDD, DTO-Resources statt Entities, RLS), fachliche
   Regeln, Sprachen, Datengrundsätze.
 - **[docs/pwa/offline.md](docs/pwa/offline.md)** beschreibt Offline-Betrieb, Abgleich und Konfliktvermeidung der PWA.
-- **[docs/uebernahme.md](docs/uebernahme.md)** ist die Checkliste aller Bildschirme und Ketten aus TempoVibe, mit
+- **[docs/porting-status.md](docs/porting-status.md)** ist die Checkliste aller Bildschirme und Ketten aus TempoVibe, mit
   den Tabellen je Kette. Reihenfolge: Anmeldung/Zugang → Stunden → Anträge → Disposition → NU → Kosten/Leitung.
 - **TempoVibe** ist die fachliche Wahrheit und wird nicht verändert.
 - Keine Geheimnisse ins Repo (`.env`, `.env.local`, Schlüssel). Vorlagen sind `.env.example` und
@@ -207,5 +235,5 @@ und wird bei jedem Deploy mit kopiert. Details: [ADR 0003](docs/adr/0003-deploym
 ### Architekturentscheidungen
 
 - [ADR 0001 – Monorepo, nginx mit PHP-FPM, ein Origin](docs/adr/0001-monorepo-nginx-php-fpm.md)
-- [ADR 0002 – Anmeldung mit Konten in der eigenen Datenbank statt OIDC](docs/adr/0002-anmeldung-db-statt-oidc.md)
+- [ADR 0002 – Anmeldung mit Konten in der eigenen Datenbank statt OIDC](docs/adr/0002-own-accounts-instead-of-oidc.md)
 - [ADR 0003 – Deployment nach Mittwald per GitHub Actions](docs/adr/0003-deployment-mittwald.md)

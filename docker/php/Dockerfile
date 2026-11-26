@@ -1,9 +1,9 @@
-# PHP-FPM für die Tempo-API (Symfony + API Platform)
+# PHP-FPM for the Tempo API (Symfony + API Platform)
 FROM php:8.4-fpm
 
 WORKDIR /var/www/html
 
-# Systempakete nur für die benötigten Erweiterungen und Composer
+# System packages only for the required extensions and Composer
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         unzip \
@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Xdebug (Einstellungen in myPhp.ini)
+# Xdebug (settings in myPhp.ini)
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
@@ -32,7 +32,7 @@ RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | b
     && apt-get install -y --no-install-recommends symfony-cli \
     && rm -rf /var/lib/apt/lists/*
 
-# Benutzer www (UID/GID 1000) wie in den anderen Projekten
+# User www (UID/GID 1000) as in the other projects
 RUN groupadd -g 1000 www \
     && useradd -u 1000 -ms /bin/bash -g www www
 

@@ -33,7 +33,7 @@ Pfad: `~/Developer/privat/baumann/TempoVibe` (eigenes Repo, eigenes Claude-Proje
   - `src/domain/store.tsx`: alle Aktionen, also die spätere API-Oberfläche
   - `src/domain/zeit.ts`, `lohn.ts`, `zuschlaege.ts`, `zugang.ts`: Fachlogik
   - `src/domain/seed.ts`: Demo-Daten (Vorlage für Fixtures)
-  - `src/screens/{ma,polier,bau,pc,nu}`, `src/components/`: UI
+  - `src/screens/{worker,site-foreman,site-manager,office,subcontractor}`, `src/components/`: UI
   - `src/i18n/*.json`, `src/domain/texte/*.json`: Übersetzungen und Rechtstexte
 
 ## Sprache des Codes: Englisch (verbindlich)
@@ -43,8 +43,10 @@ Pfad: `~/Developer/privat/baumann/TempoVibe` (eigenes Repo, eigenes Claude-Proje
 - **Deutsch bleiben** nur die sichtbaren Texte der App (über `tx('Deutscher Text')`, der deutsche Text ist der Schlüssel)
   und die Prosa der Dokumentation in `docs/`. Dateinamen in `docs/` sind englisch.
 - Übersetzung der Fachbegriffe und der Tabellen aus dem TempoVibe-Schema: `docs/database/naming.md`.
-- Stand: Neuer Code ist englisch (Kontext `Access`, `pwa/src/auth`, Login-Bildschirme). Der Rest (Grundgerüst, `System`,
-  `i18n`, `offline`, Komponenten aus TempoVibe, CSS-Klassen) wird nach der Anmeldung in einem eigenen Schritt umbenannt.
+- Stand: Der gesamte Code ist englisch, auch Grundgerüst, `System`, `i18n`, `offline`, Komponenten, CSS-Klassen und
+  -Variablen, Skripte und Konfiguration. Ausgaben der Entwicklerskripte (`deployment.sh`, `post-deploy.sh`, `help` im
+  php-Container) bleiben deutsch, sie richten sich an Menschen. Die Zuordnung der TempoVibe-Namen (Ordner, Komponenten,
+  CSS-Klassen) steht in `docs/database/naming.md`.
 
 ## Aufbau des Repos
 
@@ -57,7 +59,7 @@ Tempo/
 │   ├── php/myPhp.ini       # gemountet als conf.d/zzz_myPhp.ini
 │   ├── php/home/           # Home des Users www (Composer-Cache), ignoriert
 │   ├── nginx/conf/         # nginx.conf, default.conf, pwa-dev.conf, pwa-prod.conf
-│   ├── nginx/start.sh      # wählt PWA_MODUS (dev/prod), erzeugt optional Basic Auth
+│   ├── nginx/start.sh      # wählt PWA_MODE (dev/prod), erzeugt optional Basic Auth
 │   └── postgres/           # Init-Skripte (nur beim ersten Start, z. B. Erweiterungen)
 ├── log/                    # nginx- und PHP-Logs, ignoriert
 ├── api/                    # Symfony + API Platform
@@ -67,7 +69,7 @@ Tempo/
 ├── VERSION                 # aktuelle Version, gelesen von API (Swagger, Health), PWA (Fußzeile), README (Badge)
 ├── README.md               # Einstieg: Umgebungen, Start, Befehle, Deployment
 ├── .github/workflows/      # Build, Test und Deploy nach Mittwald
-├── docs/                   # Architekturentscheidungen (adr/), Offline-Konzept (pwa/), Übernahme-Stand (uebernahme.md)
+├── docs/                   # Architekturentscheidungen (adr/), Offline-Konzept (pwa/), Übernahme-Stand (porting-status.md)
 └── CLAUDE.md
 ```
 
@@ -111,7 +113,7 @@ Ein Repo, kein Git-Submodule. API und PWA ändern sich gemeinsam in einem Commit
   (vorher einmal `bin/console doctrine:database:create --env=test` und nach jeder neuen Migration
   `bin/console doctrine:migrations:migrate -n --env=test`).
 - PWA: `docker compose exec pwa npm run build`, Typen neu erzeugen `docker compose exec pwa npm run api:types`.
-- Prod-Modus lokal prüfen: `npm run build`, dann `PWA_MODUS=prod docker compose up -d nginx`.
+- Prod-Modus lokal prüfen: `npm run build`, dann `PWA_MODE=prod docker compose up -d nginx`.
 - Aufbau der API: je Kontext `src/<Context>/{Domain,Application,Infrastructure,Api}`; API-Resources (DTOs) und
   State Provider/Processor unter `Api/`. Die Domänenklassen werden per **XML-Mapping** aus
   `Infrastructure/Doctrine/Mapping` gespeichert (keine Doctrine-Attribute in der Domäne), Repositories als
@@ -168,7 +170,8 @@ Ein Repo, kein Git-Submodule. API und PWA ändern sich gemeinsam in einem Commit
   Verbindliches Konzept: `docs/pwa/offline.md` (Ereignisse mit Client-UUID statt Zustandsabgleich,
   idempotente Operationen, ein Besitzer je Tag, fachliche Klärfälle statt technischer Konflikte).
 - App-Icons: `pwa/scripts/icons.mjs` (weißes „K.“ auf `#0077c8`), Installation auf dem Handy im README.
-- Die Struktur der Bildschirme aus TempoVibe bleibt erhalten: `src/screens/{ma,polier,bau,pc,nu}`.
+- Die Struktur der Bildschirme aus TempoVibe bleibt erhalten, mit englischen Ordnern: `ma` → `worker`, `polier` →
+  `site-foreman`, `bau` → `site-manager`, `pc` → `office`, `nu` → `subcontractor` (`src/screens/…`).
 - Der Zustand aus `store.tsx` (localStorage) wird durch API-Aufrufe ersetzt. Kein localStorage für Fachdaten.
 - `npm run build` (Typecheck und Build) muss fehlerfrei durchlaufen.
 
@@ -184,7 +187,7 @@ Bildschirm für Bildschirm, entlang der Ketten aus `docs/demo-app.md`:
 4. API-Operationen anlegen, OpenAPI-Typen neu generieren.
 5. Bildschirm aus TempoVibe übernehmen und an die API anschließen.
 6. Kette im Browser durchklicken und mit der Demo vergleichen.
-7. Stand in `docs/uebernahme.md` abhaken (welcher Bildschirm, welche Kette, was fehlt).
+7. Stand in `docs/porting-status.md` abhaken (welcher Bildschirm, welche Kette, was fehlt).
 
 Reihenfolge-Vorschlag: Anmeldung/Zugang → Stunden-Kette → Anträge → Disposition → NU → Kosten/Leitung.
 
